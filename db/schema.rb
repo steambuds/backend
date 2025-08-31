@@ -18,7 +18,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_21_201333) do
     t.string "name"
     t.string "email"
     t.text "description"
-    t.text "subject"
+    t.string "mobile_number"
     t.string "category"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

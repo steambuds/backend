@@ -4,6 +4,7 @@ module Api
       def index
         render json: Hello.all
       end
+
       def create
         hello = Hello.new(hello_params)
         if hello.save
@@ -16,7 +17,7 @@ module Api
       private
 
       def hello_params
-        params.require(:hello).permit(:name, :email, :description, :subject, :category)
+        params.permit(:name, :email, :description, :mobile_number, :category)
       end
     end
 
