@@ -20,6 +20,5 @@ module Api
         params.permit(:name, :email, :description, :mobile_number, :category)
       end
     end
-
   end
 end

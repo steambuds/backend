@@ -15,7 +15,7 @@ RSpec.describe "Api::V1::Hello", type: :request do
   end
 
   describe "POST /create" do
-    let(:valid_params)  {attributes_for(:hello)}
+    let(:valid_params)  { attributes_for(:hello) }
 
     it "creates a new hello" do
       expect {
