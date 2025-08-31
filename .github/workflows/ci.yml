@@ -72,6 +72,6 @@ jobs:
       - name: Run tests
         env:
           RAILS_ENV: test
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432
           # REDIS_URL: redis://localhost:6379/0
         run: bin/rails spec
