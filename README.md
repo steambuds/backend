@@ -1,24 +1,33 @@
-# README
+# Readme
+## Setup the repo on VPS manually
+### install mise by 
+```bash
+curl https://mise.run | sh
+```
+### activate mise 
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+```bash
+echo 'eval "$(~/.local/bin/mise activate bash)"' >> ~/.bashrc
+```
+then source
+```bash
+source ~/.bashrc
+```
 
-Things you may want to cover:
+### install ruby
+```bash
+mise install ruby@[version]
+```
+### get the repo on the vps
+use github or rsync
 
-* Ruby version
+### set environement variables 
+```bash
+echo 
+```
 
-* System dependencies
 
-* Configuration
+## How to run this api on VPS like ec2.
+### requirements
+1. git
 
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
