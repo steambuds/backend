@@ -25,7 +25,7 @@
 # be configured to provide at least as many connections as the number of
 # threads. This includes Active Record's `pool` parameter in `database.yml`.
 # Number of workers (processes)
-if ENV["RAILS_ENV"] == "production" do 
+if ENV["RAILS_ENV"] == "production"
     workers ENV.fetch("WEB_CONCURRENCY") { 2 }
 end
 
@@ -34,7 +34,7 @@ threads threads_count, threads_count
 
 # Preload app for faster worker spawn
 
-if ENV["RAILS_ENV"] == "production" do 
+if ENV["RAILS_ENV"] == "production"
     preload_app!
 end
 

@@ -49,3 +49,6 @@ group :development, :test do
   gem 'factory_bot_rails'
   gem 'faker'
 end
+
+gem "bcrypt", "~> 3.1"
+gem "jwt"
