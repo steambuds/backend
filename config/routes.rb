@@ -7,10 +7,10 @@ Rails.application.routes.draw do
 
   namespace :api, defaults: { format: :json } do
     # Authentication routes
-    resources :user, only: [:create], controller: 'registrations'
-    post 'login', to: 'sessions#create'
-    delete 'logout', to: 'sessions#destroy'
-    resources :hello, only: [:index, :create]
+    resources :user, only: [ :create ], controller: "registrations"
+    post "login", to: "sessions#create"
+    delete "logout", to: "sessions#destroy"
+    resources :hello, only: [ :index, :create ]
   end
   # Defines the root path route ("/")
   # root "posts#index"

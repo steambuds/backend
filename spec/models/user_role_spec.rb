@@ -10,11 +10,11 @@ RSpec.describe UserRole, type: :model do
 
   describe "enum" do
     it "defines role enum with admin, server_machine, and manager" do
-      expect(UserRole.roles.keys).to match_array(['admin', 'server_machine', 'manager'])
+      expect(UserRole.roles.keys).to match_array([ 'admin', 'server_machine', 'manager' ])
     end
 
     it "stores role as string in database" do
-      expect(UserRole.roles.values).to match_array(['admin', 'server_machine', 'manager'])
+      expect(UserRole.roles.values).to match_array([ 'admin', 'server_machine', 'manager' ])
     end
 
     it "allows setting role to admin" do

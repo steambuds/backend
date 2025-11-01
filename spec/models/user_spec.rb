@@ -83,7 +83,7 @@ RSpec.describe User, type: :model do
     it "returns all roles assigned to the user" do
       create(:user_role, user: user, role: :admin)
       create(:user_role, user: user, role: :manager)
-      expect(user.roles).to match_array(['admin', 'manager'])
+      expect(user.roles).to match_array([ 'admin', 'manager' ])
     end
   end
 

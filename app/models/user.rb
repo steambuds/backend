@@ -3,10 +3,10 @@ class User < ApplicationRecord
 
   validates :username, presence: true, uniqueness: true
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
-  validates :password, presence: true, length: { minimum: 8 }, 
-            format: { 
+  validates :password, presence: true, length: { minimum: 8 },
+            format: {
               with: /\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+\z/,
-              message: 'must include at least one lowercase letter, one uppercase letter, and one digit' }
+              message: "must include at least one lowercase letter, one uppercase letter, and one digit" }
   has_many :refresh_tokens, dependent: :destroy
   has_many :user_roles, dependent: :destroy
 
