@@ -10,10 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_30_040935) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_01_033928) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
-  enable_extension "pgcrypto"
 
   create_table "hellos", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name"
@@ -25,8 +24,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_30_040935) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "refresh_tokens", force: :cascade do |t|
-    t.bigint "user_id", null: false
+  create_table "refresh_tokens", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
     t.string "token"
     t.datetime "expires_at"
     t.datetime "created_at", null: false
@@ -35,16 +34,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_30_040935) do
     t.index ["user_id"], name: "index_refresh_tokens_on_user_id"
   end
 
-  create_table "users", force: :cascade do |t|
+  create_table "user_roles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "role", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "role"], name: "index_user_roles_on_user_id_and_role", unique: true
+    t.index ["user_id"], name: "index_user_roles_on_user_id"
+  end
+
+  create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "username"
     t.string "email"
     t.string "encrypted_password"
     t.datetime "remember_created_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "role", default: 0, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
   add_foreign_key "refresh_tokens", "users"
+  add_foreign_key "user_roles", "users"
 end

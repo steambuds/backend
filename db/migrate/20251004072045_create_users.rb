@@ -2,7 +2,7 @@
 
 class CreateUsers < ActiveRecord::Migration[8.0]
   def change
-    create_table :users do |t|
+    create_table :users, id: :uuid do |t|
       ## Database authenticatable
       t.string :username
       t.string :email

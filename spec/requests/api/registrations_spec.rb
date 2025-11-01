@@ -24,11 +24,11 @@ RSpec.describe 'POST /api/user', type: :request do
       json_response = JSON.parse(response.body)
       expect(json_response['email']).to eq('test@example.com')
       expect(json_response['username']).to eq('testuser')
-      expect(json_response).to have_key('id')
+      expect(json_response['id']).not_to be_empty
     end
 
-    it 'creates a user with the default role of user' do
-      expect(User.first.role).to eq('user')
+    it 'does not assign a role by default' do
+      expect(User.first.roles).to be_empty
     end
   end
 
@@ -43,8 +43,8 @@ RSpec.describe 'POST /api/user', type: :request do
         expect(User.count).to eq(1)
       end
 
-      it 'returns an unprocessable_entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns an unprocessable_content status' do
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'returns a validation error message' do
@@ -56,8 +56,8 @@ RSpec.describe 'POST /api/user', type: :request do
     context 'with a missing parameter' do
       before { post '/api/user', params: { email: 'test@example.com' } }
 
-      it 'returns an unprocessable_entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns an unprocessable_content status' do
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end

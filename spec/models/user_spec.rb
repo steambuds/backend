@@ -58,4 +58,45 @@ RSpec.describe User, type: :model do
     user = create(:user, password: "1Securepass")
     expect(user.valid_password?("wrongpass")).to be false
   end
+
+  describe "associations" do
+    it "has many user_roles with dependent destroy" do
+      user = create(:user)
+      create(:user_role, user: user)
+      expect { user.destroy }.to change { UserRole.count }.by(-1)
+    end
+
+    it "has many refresh_tokens with dependent destroy" do
+      user = create(:user)
+      create(:refresh_token, user: user)
+      expect { user.destroy }.to change { RefreshToken.count }.by(-1)
+    end
+  end
+
+  describe "#roles" do
+    let(:user) { create(:user) }
+
+    it "returns an empty array when user has no roles" do
+      expect(user.roles).to eq([])
+    end
+
+    it "returns all roles assigned to the user" do
+      create(:user_role, user: user, role: :admin)
+      create(:user_role, user: user, role: :manager)
+      expect(user.roles).to match_array(['admin', 'manager'])
+    end
+  end
+
+  describe "#has_role?" do
+    let(:user) { create(:user) }
+    let!(:user_role) { create(:user_role, user: user, role: :admin) }
+
+    it "returns true if the user has the role" do
+      expect(user.has_role?(:admin)).to be true
+    end
+
+    it "returns false if the user does not have the role" do
+      expect(user.has_role?(:manager)).to be false
+    end
+  end
 end

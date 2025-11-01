@@ -8,8 +8,15 @@ class User < ApplicationRecord
               with: /\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+\z/,
               message: 'must include at least one lowercase letter, one uppercase letter, and one digit' }
   has_many :refresh_tokens, dependent: :destroy
-  enum :role, [:user, :admin]
+  has_many :user_roles, dependent: :destroy
 
+  def roles
+    user_roles.map(&:role)
+  end
+
+  def has_role?(role_name)
+    user_roles.exists?(role: role_name)
+  end
 
   # before saving, encrypt password
   before_save :encrypt_password
