@@ -7,7 +7,7 @@ RSpec.describe "Api::V1::Hello", type: :request do
     end
 
     it "returns a list of hellos" do
-      get "/api/v1/hello"
+      get "/api/hello"
 
       expect(response).to have_http_status(:ok)
       expect(JSON.parse(response.body).count).to eq(3)
@@ -19,7 +19,7 @@ RSpec.describe "Api::V1::Hello", type: :request do
 
     it "creates a new hello" do
       expect {
-        post "/api/v1/hello", params: valid_params
+        post "/api/hello", params: valid_params
       }.to change(Hello, :count).by(1)
       expect(response).to have_http_status(:created)
       json = JSON.parse(response.body)

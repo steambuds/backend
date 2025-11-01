@@ -50,3 +50,6 @@ group :development, :test do
   gem "faker"
   gem "dotenv-rails"
 end
+
+gem "bcrypt", "~> 3.1"
+gem "jwt"
