@@ -11,7 +11,7 @@ Rails.application.routes.draw do
     post "login", to: "sessions#create"
     delete "logout", to: "sessions#destroy"
     post "refresh", to: "refreshes#create"
-    resources :hello, only: [ :index, :create ]
+    resources :hello, only: [ :index, :create, :destroy ]
   end
   # Defines the root path route ("/")
   # root "posts#index"
