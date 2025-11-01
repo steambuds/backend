@@ -3,15 +3,21 @@ require 'rails_helper'
 RSpec.describe "Api::V1::Hello", type: :request do
   describe "GET /index" do
     let(:user) { create(:user) }
+    let(:admin_user) { create(:user, username: "admin", email: "admin@example.com") }
     let(:token) { JsonWebToken.encode(user_id: user.id) }
+    let(:admin_token) { JsonWebToken.encode(user_id: admin_user.id) }
 
-    context 'with valid JWT token' do
+    before do
+      admin_user.user_roles.create!(role: :admin)
+    end
+
+    context 'with valid JWT token and admin role' do
       before do
         create_list(:hello, 3)
       end
 
       it "returns a list of hellos" do
-        get "/api/hello", headers: { 'Authorization' => "Bearer #{token}" }
+        get "/api/hello", headers: { 'Authorization' => "Bearer #{admin_token}" }
 
         expect(response).to have_http_status(:ok)
         expect(JSON.parse(response.body).count).to eq(3)
@@ -19,7 +25,7 @@ RSpec.describe "Api::V1::Hello", type: :request do
 
       it "returns all hello attributes" do
         hello = create(:hello, name: "Test Name", description: "Test Desc")
-        get "/api/hello", headers: { 'Authorization' => "Bearer #{token}" }
+        get "/api/hello", headers: { 'Authorization' => "Bearer #{admin_token}" }
 
         json = JSON.parse(response.body)
         hello_json = json.find { |h| h['id'] == hello.id }
@@ -30,10 +36,21 @@ RSpec.describe "Api::V1::Hello", type: :request do
 
     context 'when no hellos exist' do
       it "returns an empty array" do
-        get "/api/hello", headers: { 'Authorization' => "Bearer #{token}" }
+        get "/api/hello", headers: { 'Authorization' => "Bearer #{admin_token}" }
 
         expect(response).to have_http_status(:ok)
         expect(JSON.parse(response.body)).to eq([])
+      end
+    end
+
+    context 'with valid JWT token but no admin role' do
+      it "returns 403 Forbidden" do
+        get "/api/hello", headers: { 'Authorization' => "Bearer #{token}" }
+
+        expect(response).to have_http_status(:forbidden)
+        json = JSON.parse(response.body)
+        expect(json['error']).to eq('Forbidden')
+        expect(json['message']).to eq('You do not have permission to access this resource')
       end
     end
 
@@ -249,6 +266,71 @@ RSpec.describe "Api::V1::Hello", type: :request do
         json = JSON.parse(response.body)
         expect(json['errors']).to be_an(Array)
         expect(json['errors'].length).to be >= 3
+      end
+    end
+  end
+
+  describe "DELETE /destroy" do
+    let(:hello) { create(:hello) }
+    let(:user) { create(:user) }
+    let(:admin_user) { create(:user, username: "admin", email: "admin@example.com") }
+    let(:token) { JsonWebToken.encode(user_id: user.id) }
+    let(:admin_token) { JsonWebToken.encode(user_id: admin_user.id) }
+
+    before do
+      admin_user.user_roles.create!(role: :admin)
+    end
+
+    context 'with admin role' do
+      it "deletes the hello" do
+        hello_to_delete = create(:hello)
+        expect {
+          delete "/api/hello/#{hello_to_delete.id}", headers: { 'Authorization' => "Bearer #{admin_token}" }
+        }.to change(Hello, :count).by(-1)
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body)
+        expect(json['message']).to eq('Hello deleted successfully')
+      end
+
+      it "returns 404 when hello does not exist" do
+        delete "/api/hello/00000000-0000-0000-0000-000000000000", headers: { 'Authorization' => "Bearer #{admin_token}" }
+        expect(response).to have_http_status(:not_found)
+        json = JSON.parse(response.body)
+        expect(json['error']).to eq('Hello not found')
+      end
+    end
+
+    context 'without admin role' do
+      it "returns 403 Forbidden" do
+        hello_to_delete = create(:hello)
+        delete "/api/hello/#{hello_to_delete.id}", headers: { 'Authorization' => "Bearer #{token}" }
+        expect(response).to have_http_status(:forbidden)
+        json = JSON.parse(response.body)
+        expect(json['error']).to eq('Forbidden')
+        expect(json['message']).to eq('You do not have permission to access this resource')
+      end
+
+      it "does not delete the hello" do
+        hello_to_delete = create(:hello)
+        expect {
+          delete "/api/hello/#{hello_to_delete.id}", headers: { 'Authorization' => "Bearer #{token}" }
+        }.not_to change(Hello, :count)
+      end
+    end
+
+    context 'without authentication' do
+      it "returns 401 Unauthorized" do
+        delete "/api/hello/#{hello.id}"
+        expect(response).to have_http_status(:unauthorized)
+        json = JSON.parse(response.body)
+        expect(json['error']).to eq('Missing token')
+      end
+    end
+
+    context 'with invalid token' do
+      it "returns 401 Unauthorized" do
+        delete "/api/hello/#{hello.id}", headers: { 'Authorization' => 'Bearer invalid_token' }
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end

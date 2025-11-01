@@ -1,10 +1,19 @@
 module Api
   class HelloController < ApplicationController
-    before_action :authenticate_request!, only: [ :index ]
+    before_action -> { authorize_role!(:admin) }, only: [ :index, :destroy ]
 
     def index
       render json: Hello.all
     end
+
+    def destroy
+      hello = Hello.find(params[:id])
+      hello.destroy
+      render json: { message: "Hello deleted successfully" }, status: :ok
+    rescue ActiveRecord::RecordNotFound
+      render json: { error: "Hello not found" }, status: :not_found
+    end
+
     def create
       hello = Hello.new(hello_params)
       if hello.save

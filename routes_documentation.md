@@ -95,7 +95,7 @@ curl -X POST -H "Content-Type: application/json" -d '{
 
 ### Get All Hellos
 
-Retrieves a list of all "hello" records. **Requires JWT authentication.**
+Retrieves a list of all "hello" records. **Requires JWT authentication and admin role.**
 
 **Endpoint:** `GET /api/hello`
 
@@ -158,9 +158,70 @@ curl -X POST -H "Content-Type: application/json" -d '{
 
 ---
 
-## Authentication Notes
+### Delete a Hello
+
+Deletes a specific "hello" record by ID. **Requires JWT authentication and admin role.**
+
+**Endpoint:** `DELETE /api/hello/:id`
+
+**Request:**
+```bash
+curl -X DELETE -H "Authorization: Bearer your_access_token" \
+  http://localhost:3000/api/hello/uuid-here
+```
+
+**Response (Success):**
+```json
+{
+  "message": "Hello deleted successfully"
+}
+```
+
+**Response (Not Found):**
+```json
+{
+  "error": "Hello not found"
+}
+```
+
+**Response (Unauthorized - missing or invalid token):**
+```json
+{
+  "error": "Unauthorized",
+  "message": "Authentication token is missing or invalid"
+}
+```
+
+**Response (Forbidden - user lacks admin role):**
+```json
+{
+  "error": "Forbidden",
+  "message": "You do not have permission to access this resource"
+}
+```
+
+---
+
+## Authentication & Authorization Notes
 
 - **Access Token:** Short-lived (24 hours), used for API requests
 - **Refresh Token:** Long-lived (30 days), used to obtain new access tokens
 - **Authorization Header Format:** `Bearer <access_token>`
 - Protected endpoints will return `401 Unauthorized` without a valid token
+- Role-protected endpoints will return `403 Forbidden` if the authenticated user lacks the required role
+
+### Available Roles
+- **admin** - Administrator role with full access to all protected endpoints
+- **manager** - Manager role with elevated permissions
+- **server_machine** - Server/machine role for automated processes
+
+### Endpoint Access Summary
+| Endpoint | Authentication Required | Role Required |
+|----------|------------------------|---------------|
+| POST /api/user | No | None |
+| POST /api/login | No | None |
+| POST /api/refresh | No | None |
+| DELETE /api/logout | No | None |
+| POST /api/hello | No | None |
+| GET /api/hello | Yes | admin |
+| DELETE /api/hello/:id | Yes | admin |
