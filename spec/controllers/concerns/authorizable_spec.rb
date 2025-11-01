@@ -2,8 +2,8 @@ require "rails_helper"
 
 RSpec.describe Authorizable, type: :controller do
   controller(ApplicationController) do
-    before_action -> { authorize_role!(:admin) }, only: [:admin_only_action]
-    before_action -> { authorize_role!(:admin, :manager) }, only: [:multi_role_action]
+    before_action -> { authorize_role!(:admin) }, only: [ :admin_only_action ]
+    before_action -> { authorize_role!(:admin, :manager) }, only: [ :multi_role_action ]
 
     def test_action
       render json: { message: "Success" }
