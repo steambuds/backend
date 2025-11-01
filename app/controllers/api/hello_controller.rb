@@ -15,7 +15,7 @@ module Api
     private
 
     def hello_params
-      params.require(:hello).permit(:name, :email, :description, :subject, :category)
+      params.permit(:name, :email, :description, :mobile_number, :category)
     end
   end
 end

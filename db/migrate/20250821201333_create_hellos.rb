@@ -4,7 +4,7 @@ class CreateHellos < ActiveRecord::Migration[8.0]
       t.string :name
       t.string :email
       t.text :description
-      t.text :subject
+      t.string :mobile_number
       t.string :category
       t.timestamps
     end

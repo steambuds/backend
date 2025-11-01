@@ -10,46 +10,46 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_01_033928) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_01_033928) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "hellos", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "name"
-    t.string "email"
-    t.text "description"
-    t.text "subject"
     t.string "category"
     t.datetime "created_at", null: false
+    t.text "description"
+    t.string "email"
+    t.string "mobile_number"
+    t.string "name"
     t.datetime "updated_at", null: false
   end
 
   create_table "refresh_tokens", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "user_id", null: false
-    t.string "token"
-    t.datetime "expires_at"
     t.datetime "created_at", null: false
+    t.datetime "expires_at"
+    t.string "token"
     t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false
     t.index ["token"], name: "index_refresh_tokens_on_token"
     t.index ["user_id"], name: "index_refresh_tokens_on_user_id"
   end
 
   create_table "user_roles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "user_id", null: false
-    t.string "role", null: false
     t.datetime "created_at", null: false
+    t.string "role", null: false
     t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false
     t.index ["user_id", "role"], name: "index_user_roles_on_user_id_and_role", unique: true
     t.index ["user_id"], name: "index_user_roles_on_user_id"
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "username"
+    t.datetime "created_at", null: false
     t.string "email"
     t.string "encrypted_password"
     t.datetime "remember_created_at"
-    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "username"
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
