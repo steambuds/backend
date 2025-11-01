@@ -1,6 +1,6 @@
 module Api
   class HelloController < ApplicationController
-    before_action :authenticate_request!, only: [:index]
+    before_action :authenticate_request!, only: [ :index ]
 
     def index
       render json: Hello.all

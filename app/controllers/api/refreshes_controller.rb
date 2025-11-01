@@ -4,13 +4,13 @@ module Api
       refresh_token = RefreshToken.find_by(token: params[:refresh_token])
 
       if refresh_token.nil?
-        render json: { error: 'Invalid refresh token' }, status: :unauthorized
+        render json: { error: "Invalid refresh token" }, status: :unauthorized
         return
       end
 
       if refresh_token.expired?
         refresh_token.destroy
-        render json: { error: 'Refresh token expired' }, status: :unauthorized
+        render json: { error: "Refresh token expired" }, status: :unauthorized
         return
       end
 
