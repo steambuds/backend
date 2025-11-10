@@ -19,10 +19,10 @@ RSpec.describe User, type: :model do
     expect(subject.errors[:username]).to include("has already been taken")
   end
 
-  it "is invalid without an email" do
+  it "is valid without an email if mobile_number is present" do
     subject.email = nil
-    expect(subject).not_to be_valid
-    expect(subject.errors[:email]).to include("can't be blank")
+    subject.mobile_number = "+1234567890"
+    expect(subject).to be_valid
   end
 
   it "is invalid with an invalid email format" do
@@ -49,6 +49,35 @@ RSpec.describe User, type: :model do
     expect(subject.errors[:email]).to include("has already been taken")
   end
 
+  it "is valid with mobile_number instead of email" do
+    user = build(:user, email: nil, mobile_number: "+1234567890")
+    expect(user).to be_valid
+  end
+
+  it "is valid with both email and mobile_number" do
+    user = build(:user, email: "test@example.com", mobile_number: "+1234567890")
+    expect(user).to be_valid
+  end
+
+  it "is invalid without both email and mobile_number" do
+    user = build(:user, email: nil, mobile_number: nil)
+    expect(user).not_to be_valid
+    expect(user.errors[:base]).to include("Either email or mobile number must be present")
+  end
+
+  it "validates mobile_number format" do
+    user = build(:user, email: nil, mobile_number: "invalid")
+    expect(user).not_to be_valid
+    expect(user.errors[:mobile_number]).to include("must be a valid mobile number (10-15 digits, optional +)")
+  end
+
+  it "requires unique mobile_number" do
+    create(:user, email: nil, mobile_number: "+1234567890")
+    user = build(:user, email: nil, mobile_number: "+1234567890")
+    expect(user).not_to be_valid
+    expect(user.errors[:mobile_number]).to include("has already been taken")
+  end
+
   it "authenticates with correct password" do
     user = create(:user, password: "1Securepass")
     expect(user.valid_password?("1Securepass")).to be true
@@ -70,6 +99,12 @@ RSpec.describe User, type: :model do
       user = create(:user)
       create(:refresh_token, user: user)
       expect { user.destroy }.to change { RefreshToken.count }.by(-1)
+    end
+
+    it "has one profile with dependent destroy" do
+      user = create(:user)
+      create(:profile, :teacher, user: user)
+      expect { user.destroy }.to change { Profile.count }.by(-1)
     end
   end
 
