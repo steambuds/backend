@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_01_033928) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_08_063811) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,6 +22,25 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_01_033928) do
     t.string "mobile_number"
     t.string "name"
     t.datetime "updated_at", null: false
+  end
+
+  create_table "profiles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.text "address"
+    t.string "avatar_url"
+    t.text "bio"
+    t.datetime "created_at", null: false
+    t.date "date_of_birth"
+    t.date "enrollment_date"
+    t.string "grade_level"
+    t.string "parent_contact"
+    t.string "phone"
+    t.string "qualification"
+    t.text "subjects_taught"
+    t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false
+    t.string "user_type", null: false
+    t.integer "years_experience"
+    t.index ["user_id"], name: "index_profiles_on_user_id", unique: true
   end
 
   create_table "refresh_tokens", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -47,12 +66,15 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_01_033928) do
     t.datetime "created_at", null: false
     t.string "email"
     t.string "encrypted_password"
+    t.string "mobile_number"
     t.datetime "remember_created_at"
     t.datetime "updated_at", null: false
     t.string "username"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["mobile_number"], name: "index_users_on_mobile_number", unique: true
   end
 
+  add_foreign_key "profiles", "users"
   add_foreign_key "refresh_tokens", "users"
   add_foreign_key "user_roles", "users"
 end

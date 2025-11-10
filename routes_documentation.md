@@ -202,6 +202,208 @@ curl -X DELETE -H "Authorization: Bearer your_access_token" \
 
 ---
 
+## Profile Routes
+
+### Get All Profiles
+
+Retrieves a list of all user profiles. **Requires JWT authentication and admin role.**
+
+**Endpoint:** `GET /api/profiles`
+
+**Request:**
+```bash
+curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNTI1ZjNmYmMtYWMxYi00OTcwLWI4NDAtOGEwMGUzZWUyOTUyIiwiZXhwIjoxNzYyODgyMzU3fQ.dFhnKeLHBBBFVb4WxBWONebSeAVsD3u6clibt-p75UE" \
+  http://localhost:3000/api/profiles
+```
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "user_id": "uuid",
+    "user_type": "student",
+    "bio": "A passionate student.",
+    "avatar_url": "http://example.com/avatar.jpg",
+    "phone": "+1234567890",
+    "address": "123 Main St",
+    "date_of_birth": "2000-01-01",
+    "subjects_taught": null,
+    "years_experience": null,
+    "qualification": null,
+    "grade_level": "10",
+    "enrollment_date": "2023-09-01",
+    "parent_contact": "parent@example.com",
+    "created_at": "2025-11-01T10:00:00.000Z",
+    "updated_at": "2025-11-01T10:00:00.000Z"
+  }
+]
+```
+
+---
+
+### Get a Single Profile
+
+Retrieves a specific user profile by ID. **Requires JWT authentication. Users can only access their own profile unless they have the admin role.**
+
+**Endpoint:** `GET /api/profiles/:id`
+
+**Request:**
+```bash
+curl -H "Authorization: Bearer your_access_token" \
+  http://localhost:3000/api/profiles/uuid-here
+```
+
+**Response:**
+```json
+{
+  "id": "uuid",
+  "user_id": "uuid",
+  "user_type": "student",
+  "bio": "A passionate student.",
+  "avatar_url": "http://example.com/avatar.jpg",
+  "phone": "+1234567890",
+  "address": "123 Main St",
+  "date_of_birth": "2000-01-01",
+    "subjects_taught": null,
+    "years_experience": null,
+    "qualification": null,
+    "grade_level": "10",
+    "enrollment_date": "2023-09-01",
+    "parent_contact": "parent@example.com",
+    "created_at": "2025-11-01T10:00:00.000Z",
+    "updated_at": "2025-11-01T10:00:00.000Z"
+}
+```
+
+---
+
+### Create a Profile
+
+Creates a new user profile. **Requires JWT authentication. Each user can only have one profile.**
+
+**Endpoint:** `POST /api/profiles`
+
+**Request:**
+```bash
+curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer your_access_token" -d '{
+  "user_type": "student",
+  "bio": "A passionate student.",
+  "avatar_url": "http://example.com/avatar.jpg",
+  "phone": "+1234567890",
+  "address": "123 Main St",
+  "date_of_birth": "2000-01-01",
+  "grade_level": "10",
+  "enrollment_date": "2023-09-01",
+  "parent_contact": "parent@example.com"
+}' http://localhost:3000/api/profiles
+```
+
+**Response:**
+```json
+{
+  "id": "uuid",
+  "user_id": "uuid",
+  "user_type": "student",
+  "bio": "A passionate student.",
+  "avatar_url": "http://example.com/avatar.jpg",
+  "phone": "+1234567890",
+  "address": "123 Main St",
+  "date_of_birth": "2000-01-01",
+  "subjects_taught": null,
+  "years_experience": null,
+  "qualification": null,
+  "grade_level": "10",
+  "enrollment_date": "2023-09-01",
+  "parent_contact": "parent@example.com",
+  "created_at": "2025-11-01T10:00:00.000Z",
+  "updated_at": "2025-11-01T10:00:00.000Z"
+}
+```
+
+---
+
+### Update a Profile
+
+Updates an existing user profile. **Requires JWT authentication. Users can only update their own profile unless they have the admin role.**
+
+**Endpoint:** `PUT/PATCH /api/profiles/:id`
+
+**Request:**
+```bash
+curl -X PUT -H "Content-Type: application/json" -H "Authorization: Bearer your_access_token" -d '{
+  "bio": "An updated bio for the student."
+}' http://localhost:3000/api/profiles/uuid-here
+```
+
+**Response:**
+```json
+{
+  "id": "uuid",
+  "user_id": "uuid",
+  "user_type": "student",
+  "bio": "An updated bio for the student.",
+  "avatar_url": "http://example.com/avatar.jpg",
+  "phone": "+1234567890",
+  "address": "123 Main St",
+  "date_of_birth": "2000-01-01",
+  "subjects_taught": null,
+  "years_experience": null,
+  "qualification": null,
+  "grade_level": "10",
+  "enrollment_date": "2023-09-01",
+  "parent_contact": "parent@example.com",
+  "created_at": "2025-11-01T10:00:00.000Z",
+  "updated_at": "2025-11-01T10:00:00.000Z"
+}
+```
+
+---
+
+### Delete a Profile
+
+Deletes a specific user profile. **Requires JWT authentication. Users can only delete their own profile unless they have the admin role.**
+
+**Endpoint:** `DELETE /api/profiles/:id`
+
+**Request:**
+```bash
+curl -X DELETE -H "Authorization: Bearer your_access_token" \
+  http://localhost:3000/api/profiles/uuid-here
+```
+
+**Response (Success):**
+```json
+{
+  "message": "Profile deleted successfully"
+}
+```
+
+**Response (Not Found):**
+```json
+{
+  "error": "Profile not found"
+}
+```
+
+**Response (Unauthorized - missing or invalid token):**
+```json
+{
+  "error": "Unauthorized",
+  "message": "Authentication token is missing or invalid"
+}
+```
+
+**Response (Forbidden - user lacks access or admin role):**
+```json
+{
+  "error": "Forbidden",
+  "message": "Forbidden: You can only access your own profile"
+}
+```
+
+---
+
 ## Authentication & Authorization Notes
 
 - **Access Token:** Short-lived (24 hours), used for API requests
@@ -225,3 +427,13 @@ curl -X DELETE -H "Authorization: Bearer your_access_token" \
 | POST /api/hello | No | None |
 | GET /api/hello | Yes | admin |
 | DELETE /api/hello/:id | Yes | admin |
+| GET /api/profiles | Yes | admin |
+| GET /api/profiles/:id | Yes | Own Profile or admin |
+| POST /api/profiles | Yes | None (User can only create one profile) |
+| PUT/PATCH /api/profiles/:id | Yes | Own Profile or admin |
+| DELETE /api/profiles/:id | Yes | Own Profile or admin |
+| GET /api/profiles | Yes | admin |
+| GET /api/profiles/:id | Yes | Own Profile or admin |
+| POST /api/profiles | Yes | None (User can only create one profile) |
+| PUT/PATCH /api/profiles/:id | Yes | Own Profile or admin |
+| DELETE /api/profiles/:id | Yes | Own Profile or admin |

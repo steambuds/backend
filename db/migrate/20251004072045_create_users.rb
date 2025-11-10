@@ -7,6 +7,7 @@ class CreateUsers < ActiveRecord::Migration[8.0]
       t.string :username
       t.string :email
       t.string :encrypted_password
+      t.string :mobile_number
 
       ## Recoverable
       # t.string   :reset_password_token
@@ -37,6 +38,7 @@ class CreateUsers < ActiveRecord::Migration[8.0]
       t.timestamps null: false
     end
 
-    add_index :users, :email,                unique: true
+    add_index :users, :email, unique: true
+    add_index :users, :mobile_number, unique: true
   end
 end
