@@ -14,7 +14,7 @@ curl -X POST -H "Content-Type: application/json" -d '{
   "username": "testuser",
   "email": "test@example.com",
   "password": "Password123"
-}' http://localhost:3000/api/user
+}' http://localhost:8000/api/user
 ```
 
 **Response:**
@@ -39,7 +39,7 @@ Logs in a user and returns a JWT access token and a refresh token.
 curl -X POST -H "Content-Type: application/json" -d '{
   "email": "test@example.com",
   "password": "Password123"
-}' http://localhost:3000/api/login
+}' http://localhost:8000/api/login
 ```
 
 **Response:**
@@ -62,7 +62,7 @@ Logs out a user by invalidating the refresh token.
 ```bash
 curl -X DELETE -H "Content-Type: application/json" -d '{
   "refresh_token": "your_refresh_token"
-}' http://localhost:3000/api/logout
+}' http://localhost:8000/api/logout
 ```
 
 **Response:** `204 No Content`
@@ -79,7 +79,7 @@ Generates a new access token using a valid refresh token.
 ```bash
 curl -X POST -H "Content-Type: application/json" -d '{
   "refresh_token": "your_refresh_token"
-}' http://localhost:3000/api/refresh
+}' http://localhost:8000/api/refresh
 ```
 
 **Response:**
@@ -102,7 +102,7 @@ Retrieves a list of all "hello" records. **Requires JWT authentication and admin
 **Request:**
 ```bash
 curl -H "Authorization: Bearer your_access_token" \
-  http://localhost:3000/api/hello
+  http://localhost:8000/api/hello
 ```
 
 **Response:**
@@ -137,7 +137,7 @@ curl -X POST -H "Content-Type: application/json" -d '{
   "description": "This is a test message.",
   "mobile_number": "+1234567890",
   "category": "General"
-}' http://localhost:3000/api/hello
+}' http://localhost:8000/api/hello
 ```
 
 **Note:** Either `email` or `mobile_number` must be provided (or both).
@@ -167,7 +167,7 @@ Deletes a specific "hello" record by ID. **Requires JWT authentication and admin
 **Request:**
 ```bash
 curl -X DELETE -H "Authorization: Bearer your_access_token" \
-  http://localhost:3000/api/hello/uuid-here
+  http://localhost:8000/api/hello/uuid-here
 ```
 
 **Response (Success):**
@@ -213,7 +213,7 @@ Retrieves a list of all user profiles. **Requires JWT authentication and admin r
 **Request:**
 ```bash
 curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNTI1ZjNmYmMtYWMxYi00OTcwLWI4NDAtOGEwMGUzZWUyOTUyIiwiZXhwIjoxNzYyODgyMzU3fQ.dFhnKeLHBBBFVb4WxBWONebSeAVsD3u6clibt-p75UE" \
-  http://localhost:3000/api/profiles
+  http://localhost:8000/api/profiles
 ```
 
 **Response:**
@@ -251,7 +251,7 @@ Retrieves a specific user profile by ID. **Requires JWT authentication. Users ca
 **Request:**
 ```bash
 curl -H "Authorization: Bearer your_access_token" \
-  http://localhost:3000/api/profiles/uuid-here
+  http://localhost:8000/api/profiles/uuid-here
 ```
 
 **Response:**
@@ -296,7 +296,7 @@ curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer your_
   "grade_level": "10",
   "enrollment_date": "2023-09-01",
   "parent_contact": "parent@example.com"
-}' http://localhost:3000/api/profiles
+}' http://localhost:8000/api/profiles
 ```
 
 **Response:**
@@ -333,7 +333,7 @@ Updates an existing user profile. **Requires JWT authentication. Users can only 
 ```bash
 curl -X PUT -H "Content-Type: application/json" -H "Authorization: Bearer your_access_token" -d '{
   "bio": "An updated bio for the student."
-}' http://localhost:3000/api/profiles/uuid-here
+}' http://localhost:8000/api/profiles/uuid-here
 ```
 
 **Response:**
@@ -369,7 +369,7 @@ Deletes a specific user profile. **Requires JWT authentication. Users can only d
 **Request:**
 ```bash
 curl -X DELETE -H "Authorization: Bearer your_access_token" \
-  http://localhost:3000/api/profiles/uuid-here
+  http://localhost:8000/api/profiles/uuid-here
 ```
 
 **Response (Success):**
