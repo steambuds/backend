@@ -13,6 +13,17 @@ Rails.application.routes.draw do
     post "refresh", to: "refreshes#create"
     resources :hello, only: [ :index, :create, :destroy ]
     resources :profiles
+
+    # Admin routes
+    namespace :admin do
+      resources :users, only: [ :index, :show ] do
+        member do
+          post "roles", to: "users#add_role"
+          delete "roles/:role", to: "users#remove_role", as: "remove_role"
+          put "roles", to: "users#update_roles"
+        end
+      end
+    end
   end
   # Defines the root path route ("/")
   # root "posts#index"
