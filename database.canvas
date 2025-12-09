@@ -1,0 +1,75 @@
+{
+	"nodes":[
+		{
+			"id": "users_node",
+			"x": 0,
+			"y": 0,
+			"width": 300,
+			"height": 220,
+			"type": "text",
+			"text": "## users\n---\n- **id**: uuid (PK)\n- **username**: string\n- **email**: string (UNIQUE)\n- **encrypted_password**: string\n- **mobile_number**: string (UNIQUE)\n- **created_at**: datetime\n- **updated_at**: datetime\n- **remember_created_at**: datetime"
+		},
+		{
+			"id": "profiles_node",
+			"x": -400,
+			"y": -150,
+			"width": 300,
+			"height": 380,
+			"type": "text",
+			"text": "## profiles\n---\n- **id**: uuid (PK)\n- **user_id**: uuid (FK, UNIQUE)\n- **user_type**: string\n- **bio**: text\n- **avatar_url**: string\n- **phone**: string\n- **address**: text\n- **date_of_birth**: date\n- **subjects_taught**: text\n- **years_experience**: integer\n- **qualification**: string\n- **grade_level**: string\n- **enrollment_date**: date\n- **parent_contact**: string\n- **created_at**: datetime\n- **updated_at**: datetime"
+		},
+		{
+			"id": "user_roles_node",
+			"x": -400,
+			"y": 300,
+			"width": 300,
+			"height": 160,
+			"type": "text",
+			"text": "## user_roles\n---\n- **id**: uuid (PK)\n- **user_id**: uuid (FK)\n- **role**: string\n- **created_at**: datetime\n- **updated_at**: datetime"
+		},
+		{
+			"id": "refresh_tokens_node",
+			"x": 400,
+			"y": -100,
+			"width": 300,
+			"height": 180,
+			"type": "text",
+			"text": "## refresh_tokens\n---\n- **id**: uuid (PK)\n- **user_id**: uuid (FK)\n- **token**: string\n- **expires_at**: datetime\n- **created_at**: datetime\n- **updated_at**: datetime"
+		},
+		{
+			"id": "hellos_node",
+			"x": 400,
+			"y": 300,
+			"width": 300,
+			"height": 220,
+			"type": "text",
+			"text": "## hellos\n---\n- **id**: uuid (PK)\n- **name**: string\n- **email**: string\n- **mobile_number**: string\n- **description**: text\n- **category**: string\n- **created_at**: datetime\n- **updated_at**: datetime"
+		}
+	],
+	"edges":[
+		{
+			"id": "edge_profiles_to_users",
+			"fromNode": "profiles_node",
+			"fromSide": "right",
+			"toNode": "users_node",
+			"toSide": "left",
+			"label": "has one"
+		},
+		{
+			"id": "edge_user_roles_to_users",
+			"fromNode": "user_roles_node",
+			"fromSide": "right",
+			"toNode": "users_node",
+			"toSide": "left",
+			"label": "belongs to"
+		},
+		{
+			"id": "edge_refresh_tokens_to_users",
+			"fromNode": "refresh_tokens_node",
+			"fromSide": "left",
+			"toNode": "users_node",
+			"toSide": "right",
+			"label": "belongs to"
+		}
+	]
+}
