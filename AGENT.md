@@ -336,6 +336,21 @@ PUT    /api/profiles/:id  # Update (own or admin)
 DELETE /api/profiles/:id  # Delete (own or admin)
 ```
 
+### Admin Endpoints (Protected - Admin Role Required)
+```ruby
+GET    /api/admin/users                    # List users (pagination, search, filters)
+GET    /api/admin/users/:id                # Get user details with profile & roles
+POST   /api/admin/users/:id/roles          # Add role to user
+DELETE /api/admin/users/:id/roles/:role    # Remove role from user
+PUT    /api/admin/users/:id/roles          # Update all user roles
+```
+
+**Features:**
+- **Pagination:** Default 20/page, max 100 (params: `page`, `per_page`)
+- **Search:** Fuzzy match on email/phone (param: `search`)
+- **Filters:** By role or profile_type (params: `role`, `profile_type`)
+- **Controller:** `Api::Admin::UsersController` (app/controllers/api/admin/users_controller.rb)
+
 ### Protected Endpoints with Authorization (Require JWT + Role)
 ```ruby
 GET    /api/hello         # List all hellos (requires: Bearer token + admin role)
