@@ -147,7 +147,15 @@ module Api
       end
 
       def filter_by_profile_type(users)
-        users.joins(:profile).where(profiles: { user_type: params[:profile_type] })
+        # Profile type is no longer stored - check if teacher_detail or student_details JSONB is present
+        case params[:profile_type]
+        when "teacher"
+          users.joins(:profile).where("profiles.teacher_detail IS NOT NULL AND profiles.teacher_detail != '{}'").distinct
+        when "student"
+          users.joins(:profile).where("profiles.student_details IS NOT NULL AND profiles.student_details != '{}'").distinct
+        else
+          users.joins(:profile).distinct
+        end
       end
 
       def user_with_details(user)
@@ -177,35 +185,28 @@ module Api
 
       def profile_summary(profile)
         {
-          user_type: profile.user_type,
+          name: profile.name,
           bio: profile.bio
         }
       end
 
       def profile_full(profile)
-        base = {
+        {
           id: profile.id,
-          user_type: profile.user_type,
+          name: profile.name,
+          steamer_id: profile.steamer_id,
+          father_name: profile.father_name,
+          mother_name: profile.mother_name,
+          gender: profile.gender,
           bio: profile.bio,
           avatar_url: profile.avatar_url,
-          phone: profile.phone,
+          alternate_mobile_number: profile.alternate_mobile_number,
           address: profile.address,
-          date_of_birth: profile.date_of_birth
+          date_of_birth: profile.date_of_birth,
+          teacher_detail: profile.teacher_detail,
+          student_details: profile.student_details,
+          experience: profile.experience
         }
-
-        if profile.teacher?
-          base.merge({
-            subjects_taught: profile.subjects_taught,
-            years_experience: profile.years_experience,
-            qualification: profile.qualification
-          })
-        else
-          base.merge({
-            grade_level: profile.grade_level,
-            enrollment_date: profile.enrollment_date,
-            parent_contact: profile.parent_contact
-          })
-        end
       end
     end
   end

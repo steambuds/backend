@@ -106,6 +106,27 @@ Run specific test:
 bundle exec rspec spec/models/user_spec.rb:10
 ```
 
+## Project Conventions
+
+### File Naming
+Files follow a consistent naming pattern: `[name]_[type].rb`
+- **Models:** `user.rb`, `profile.rb` (just the name, no suffix)
+- **Controllers:** `users_controller.rb`, `profiles_controller.rb` (plural + _controller)
+- **Services:** `json_web_token_service.rb` (name + _service)
+- **Factories:** `user_factory.rb`, `profile_factory.rb` (name + _factory)
+- **Specs:** Match the file being tested + `_spec.rb` suffix
+  - Model specs: `user_spec.rb`, `profile_spec.rb`
+  - Controller specs: `users_controller_spec.rb`, `profiles_controller_spec.rb`
+  - Service specs: `json_web_token_service_spec.rb`
+
+### Folder Structure
+The `spec/` directory mirrors the `app/` directory structure:
+- `app/controllers/` ↔️ `spec/controllers/`
+- `app/models/` ↔️ `spec/models/`
+- `app/services/` ↔️ `spec/services/`
+- `app/jobs/` ↔️ `spec/jobs/`
+- `spec/factories/` contains all factory files (test data convention)
+
 ## Code Quality
 
 Security scanning:

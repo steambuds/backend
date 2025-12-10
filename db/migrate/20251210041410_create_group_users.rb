@@ -19,7 +19,7 @@ class CreateGroupUsers < ActiveRecord::Migration[8.0]
     execute "ALTER TABLE group_users ADD PRIMARY KEY (group_id, user_id);"
 
     # Indexes
-    add_index :group_users, [:group_id, :user_id], unique: true
+    add_index :group_users, [ :group_id, :user_id ], unique: true
     add_index :group_users, :group_id
     add_index :group_users, :user_id
 

@@ -19,7 +19,7 @@ class CreateSchoolUsers < ActiveRecord::Migration[8.0]
     execute "ALTER TABLE school_users ADD PRIMARY KEY (school_id, user_id);"
 
     # Unique index (redundant with PK but included as per spec)
-    add_index :school_users, [:school_id, :user_id], unique: true
+    add_index :school_users, [ :school_id, :user_id ], unique: true
 
     # Foreign keys
     add_foreign_key :school_users, :schools
