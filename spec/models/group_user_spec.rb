@@ -15,7 +15,7 @@ RSpec.describe GroupUser, type: :model do
 
   describe 'validations' do
     let(:group) { create(:group) }
-    let(:student) { create(:user, roles: [:student]) }
+    let(:student) { create(:user, roles: [ :student ]) }
 
     it 'validates relation is a valid role' do
       group_user = GroupUser.new(group: group, user: student, relation: "student")
@@ -29,7 +29,7 @@ RSpec.describe GroupUser, type: :model do
     end
 
     it 'requires user to have the role' do
-      facilitator_user = create(:user, roles: [:facilitator])
+      facilitator_user = create(:user, roles: [ :facilitator ])
       group_user = GroupUser.new(group: group, user: facilitator_user, relation: "student")
       expect(group_user).not_to be_valid
       expect(group_user.errors[:base]).to include("User must have the 'student' role to be assigned as student in a group")

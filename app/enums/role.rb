@@ -12,7 +12,7 @@ module Role
   FACILITATOR = :facilitator
   STUDENT = :student
 
-  ALL = [ADMIN, SYSTEM_USER, INSTRUCTOR, FACILITATOR, STUDENT].freeze
+  ALL = [ ADMIN, SYSTEM_USER, INSTRUCTOR, FACILITATOR, STUDENT ].freeze
 
   def self.valid?(role)
     ALL.include?(role.to_sym)

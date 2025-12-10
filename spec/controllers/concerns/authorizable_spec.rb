@@ -27,8 +27,8 @@ RSpec.describe Authorizable, type: :controller do
   end
 
   let(:user) { User.create!(username: "testuser", email: "test@example.com", password: "Password123") }
-  let(:admin_user) { User.create!(username: "adminuser", email: "admin@example.com", password: "Password123", roles: [:admin]) }
-  let(:instructor_user) { User.create!(username: "instructoruser", email: "instructor@example.com", password: "Password123", roles: [:instructor]) }
+  let(:admin_user) { User.create!(username: "adminuser", email: "admin@example.com", password: "Password123", roles: [ :admin ]) }
+  let(:instructor_user) { User.create!(username: "instructoruser", email: "instructor@example.com", password: "Password123", roles: [ :instructor ]) }
 
   describe "#authorize_role!" do
     context "when user is not authenticated" do

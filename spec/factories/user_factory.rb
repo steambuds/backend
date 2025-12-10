@@ -6,23 +6,23 @@ FactoryBot.define do
     roles { [] }
 
     trait :admin do
-      roles { [:admin] }
+      roles { [ :admin ] }
     end
 
     trait :system_user do
-      roles { [:system_user] }
+      roles { [ :system_user ] }
     end
 
     trait :instructor do
-      roles { [:instructor] }
+      roles { [ :instructor ] }
     end
 
     trait :facilitator do
-      roles { [:facilitator] }
+      roles { [ :facilitator ] }
     end
 
     trait :student do
-      roles { [:student] }
+      roles { [ :student ] }
     end
   end
 end

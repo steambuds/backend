@@ -35,7 +35,7 @@ RSpec.describe "Api::Attendances", type: :request do
       json = JSON.parse(response.body)
 
       expect(json.size).to eq(2)
-      
+
       s1 = json.find { |s| s['user_id'] == student1.id }
       expect(s1).not_to be_nil
       expect(s1['name']).to eq("Student One")
@@ -81,7 +81,7 @@ RSpec.describe "Api::Attendances", type: :request do
     it "creates or updates attendance records" do
       post "/api/groups/#{group.id}/attendances", params: payload.to_json, headers: headers.merge('Content-Type' => 'application/json')
       expect(response).to have_http_status(:ok)
-      
+
       expect(Attendance.where(group: group, attendance_at: date).count).to eq(2)
       expect(Attendance.find_by(group: group, user: student1, attendance_at: date).status).to eq("present")
       expect(Attendance.find_by(group: group, user: student2, attendance_at: date).status).to eq("late")
@@ -89,10 +89,10 @@ RSpec.describe "Api::Attendances", type: :request do
 
     it "updates existing attendance" do
       create(:attendance, group: group, user: student1, attendance_at: date, status: "absent")
-      
+
       post "/api/groups/#{group.id}/attendances", params: payload.to_json, headers: headers.merge('Content-Type' => 'application/json')
       expect(response).to have_http_status(:ok)
-      
+
       expect(Attendance.find_by(group: group, user: student1, attendance_at: date).status).to eq("present")
     end
   end

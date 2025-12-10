@@ -121,15 +121,15 @@ RSpec.describe User, type: :model do
     end
 
     it "returns roles as symbols" do
-      user.roles = [:admin, :instructor]
+      user.roles = [ :admin, :instructor ]
       user.save
-      expect(user.roles).to match_array([:admin, :instructor])
+      expect(user.roles).to match_array([ :admin, :instructor ])
     end
 
     it "stores roles as strings in database" do
-      user.roles = [:admin, :instructor]
+      user.roles = [ :admin, :instructor ]
       user.save
-      expect(user.read_attribute(:roles)).to match_array(["admin", "instructor"])
+      expect(user.read_attribute(:roles)).to match_array([ "admin", "instructor" ])
     end
   end
 
@@ -137,7 +137,7 @@ RSpec.describe User, type: :model do
     let(:user) { create(:user) }
 
     before do
-      user.roles = [:admin]
+      user.roles = [ :admin ]
       user.save
     end
 
@@ -174,7 +174,7 @@ RSpec.describe User, type: :model do
     let(:user) { create(:user) }
 
     before do
-      user.roles = [:admin, :instructor]
+      user.roles = [ :admin, :instructor ]
       user.save
     end
 
@@ -222,13 +222,13 @@ RSpec.describe User, type: :model do
 
       version = user.versions.last
       expect(version.changeset).to include("username")
-      expect(version.changeset["username"]).to eq([old_username, "newusername"])
+      expect(version.changeset["username"]).to eq([ old_username, "newusername" ])
     end
 
     # Note: Skipped due to PaperTrail + transactional fixtures compatibility issue
     xit "tracks role changes" do
       user = create(:user)
-      user.update!(roles: [:admin, :instructor])
+      user.update!(roles: [ :admin, :instructor ])
 
       version = PaperTrail::Version.where(item_type: 'User', item_id: user.id).last
       expect(version.changeset).to include("roles")

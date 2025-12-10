@@ -6,17 +6,17 @@ FactoryBot.define do
 
     trait :instructor do
       relation { "instructor" }
-      association :user, factory: [:user, :instructor]
+      association :user, factory: [ :user, :instructor ]
     end
 
     trait :facilitator do
       relation { "facilitator" }
-      association :user, factory: [:user, :facilitator]
+      association :user, factory: [ :user, :facilitator ]
     end
 
     trait :student do
       relation { "student" }
-      association :user, factory: [:user, :student]
+      association :user, factory: [ :user, :student ]
     end
   end
 end

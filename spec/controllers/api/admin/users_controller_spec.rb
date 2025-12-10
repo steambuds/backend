@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe "Api::Admin::Users", type: :request do
   let(:admin_user) { create(:user, :admin, username: "admin", email: "admin@example.com") }
   let(:regular_user) { create(:user, username: "regular", email: "regular@example.com") }
-  let(:instructor_user) { create(:user, username: "instructor", email: "instructor@example.com", roles: [:instructor]) }
+  let(:instructor_user) { create(:user, username: "instructor", email: "instructor@example.com", roles: [ :instructor ]) }
   let(:admin_token) { JsonWebToken.encode(user_id: admin_user.id) }
   let(:regular_token) { JsonWebToken.encode(user_id: regular_user.id) }
 

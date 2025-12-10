@@ -5,21 +5,21 @@ module Api
     before_action :authorize_group_access!
 
     def index
-      students = @group.users.includes(:profile).where(group_users: { relation: 'student' })
+      students = @group.users.includes(:profile).where(group_users: { relation: "student" })
       attendances = Attendance.where(group_id: @group.id, user_id: students.pluck(:id))
 
       response_data = students.map do |student|
         student_attendances = attendances.select { |a| a.user_id == student.id }
-        
+
         stats = {
-          present: student_attendances.count { |a| a.status == 'present' },
-          absent: student_attendances.count { |a| a.status == 'absent' },
-          late: student_attendances.count { |a| a.status == 'late' },
-          excused: student_attendances.count { |a| a.status == 'excused' }
+          present: student_attendances.count { |a| a.status == "present" },
+          absent: student_attendances.count { |a| a.status == "absent" },
+          late: student_attendances.count { |a| a.status == "late" },
+          excused: student_attendances.count { |a| a.status == "excused" }
         }
 
         calendar = student_attendances.each_with_object({}) do |a, hash|
-          hash[a.attendance_at.strftime('%Y-%m-%d')] = a.status
+          hash[a.attendance_at.strftime("%Y-%m-%d")] = a.status
         end
 
         {
@@ -78,8 +78,8 @@ module Api
 
     def authorize_group_access!
       # Check if current user is an instructor or facilitator in this group
-      is_teacher = @group.group_users.exists?(user: current_user, relation: ['instructor', 'facilitator'])
-      render json: { error: 'Forbidden' }, status: :forbidden unless is_teacher
+      is_teacher = @group.group_users.exists?(user: current_user, relation: [ "instructor", "facilitator" ])
+      render json: { error: "Forbidden" }, status: :forbidden unless is_teacher
     end
   end
 end

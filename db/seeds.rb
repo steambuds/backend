@@ -48,29 +48,29 @@ puts "\n=== Creating 20 Users ==="
 puts "  " + "-"*58
 
 # 1. Admin (1 user)
-admin = create_user("Ghanshyam", [:admin], {
+admin = create_user("Ghanshyam", [ :admin ], {
   bio: "System Administrator - STEAM Buds Platform",
   gender: "male",
   date_of_birth: Date.new(1985, 5, 15)
 })
 
 # 2. Teachers/Instructors (2 users)
-teacher1 = create_user("Priya Sharma", [:instructor], {
+teacher1 = create_user("Priya Sharma", [ :instructor ], {
   roll_specific_detail: {
     qualification: "B.Ed in Mathematics, M.Sc Mathematics",
     years_of_experience: 5,
-    subjects: ["Mathematics", "Physics", "Computer Science"]
+    subjects: [ "Mathematics", "Physics", "Computer Science" ]
   },
   bio: "Mathematics Teacher - Greenwood Public School",
   gender: "female",
   date_of_birth: Date.new(1990, 3, 20)
 })
 
-teacher2 = create_user("Rajesh Kumar", [:instructor], {
+teacher2 = create_user("Rajesh Kumar", [ :instructor ], {
   roll_specific_detail: {
     qualification: "M.Sc in Biology, B.Ed",
     years_of_experience: 8,
-    subjects: ["Biology", "Chemistry", "Environmental Science"]
+    subjects: [ "Biology", "Chemistry", "Environmental Science" ]
   },
   bio: "Science Teacher - Sunnydale High School",
   gender: "male",
@@ -78,13 +78,13 @@ teacher2 = create_user("Rajesh Kumar", [:instructor], {
 })
 
 # 3. Facilitators (2 users)
-facilitator1 = create_user("Anjali Verma", [:facilitator], {
+facilitator1 = create_user("Anjali Verma", [ :facilitator ], {
   bio: "Community Facilitator - STEAM Program Coordinator",
   gender: "female",
   date_of_birth: Date.new(1992, 9, 5)
 })
 
-facilitator2 = create_user("Vikram Singh", [:facilitator], {
+facilitator2 = create_user("Vikram Singh", [ :facilitator ], {
   bio: "Field Facilitator - Student Support Specialist",
   gender: "male",
   date_of_birth: Date.new(1988, 11, 25)
@@ -122,7 +122,7 @@ student_data = [
 ]
 
 students = student_data.map do |s|
-  create_user(s[:name], [:student], {
+  create_user(s[:name], [ :student ], {
     roll_specific_detail: {
       grade: s[:grade],
       section: s[:section],
@@ -280,7 +280,7 @@ group3 = Group.create!(
 GroupUser.create!(group: group3, user: facilitator2, relation: :facilitator, created_by: admin.id, updated_by: admin.id)
 
 # Random selection: 6 students from various schools
-group3_students = [students[1], students[3], students[5], students[8], students[10], students[13]]
+group3_students = [ students[1], students[3], students[5], students[8], students[10], students[13] ]
 group3_students.each do |student|
   GroupUser.create!(group: group3, user: student, relation: :student, created_by: admin.id, updated_by: admin.id)
 end
@@ -293,21 +293,21 @@ puts "     Students:    #{group3_students.count} (mixed schools)"
 puts "\n=== Creating Attendance Records (Past 30 Days) ==="
 
 # Define some student patterns for realistic attendance
-always_present = [students[0], students[4], students[6]]      # Aarav, Rohan, Kabir
-often_late = [students[2], students[7]]                       # Arjun, Ananya (late on Mondays)
-recently_excused = [students[5], students[10]]                # Sneha, Meera (excused last 2 weeks)
-occasional_absent = [students[3], students[8], students[11]]  # Ishita, Aditya, Karan
+always_present = [ students[0], students[4], students[6] ]      # Aarav, Rohan, Kabir
+often_late = [ students[2], students[7] ]                       # Arjun, Ananya (late on Mondays)
+recently_excused = [ students[5], students[10] ]                # Sneha, Meera (excused last 2 weeks)
+occasional_absent = [ students[3], students[8], students[11] ]  # Ishita, Aditya, Karan
 
 dates = (0..29).map { |i| Date.today - i.days }
 total_attendance = 0
 
-[group1, group2, group3].each_with_index do |group, idx|
+[ group1, group2, group3 ].each_with_index do |group, idx|
   group_students = group.users.joins(:group_users)
                         .where(group_users: { relation: 'student', group_id: group.id })
                         .distinct
 
   instructor = group.users.joins(:group_users)
-                    .where(group_users: { relation: ['instructor', 'facilitator'], group_id: group.id })
+                    .where(group_users: { relation: [ 'instructor', 'facilitator' ], group_id: group.id })
                     .first
 
   group_attendance_count = 0

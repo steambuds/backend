@@ -13,8 +13,8 @@ Rails.application.routes.draw do
     post "refresh", to: "refreshes#create"
     resources :hello, only: [ :index, :create, :destroy ]
     resources :profiles
-    resources :groups, only: [:index] do
-      resources :attendances, only: [:index, :create]
+    resources :groups, only: [ :index ] do
+      resources :attendances, only: [ :index, :create ]
     end
 
     # Admin routes

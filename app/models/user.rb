@@ -41,7 +41,7 @@ class User < ApplicationRecord
     return false unless Role.valid?(role_sym)
     return false if has_role?(role_sym)
 
-    self.roles = roles + [role_sym]
+    self.roles = roles + [ role_sym ]
     true
   end
 
@@ -50,7 +50,7 @@ class User < ApplicationRecord
     role_sym = role_name.to_sym
     return false unless has_role?(role_sym)
 
-    self.roles = roles - [role_sym]
+    self.roles = roles - [ role_sym ]
     true
   end
 
