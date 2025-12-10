@@ -1,4 +1,6 @@
 class Profile < ApplicationRecord
+  has_paper_trail
+
   self.primary_key = :id
   belongs_to :user, foreign_key: :id
 
@@ -9,7 +11,6 @@ class Profile < ApplicationRecord
   validates :gender, inclusion: { in: %w[male female other], message: "%{value} is not a valid gender" }, allow_blank: true
 
   # JSONB field default initializers
-  attribute :teacher_detail, :jsonb, default: {}
-  attribute :student_details, :jsonb, default: {}
+  attribute :roll_specific_detail, :jsonb, default: {}
   attribute :experience, :jsonb, default: {}
 end

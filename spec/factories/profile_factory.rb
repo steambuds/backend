@@ -17,21 +17,26 @@ FactoryBot.define do
     gender { %w[male female other].sample }
 
     trait :teacher do
-      teacher_detail do
+      roll_specific_detail do
         {
-          subjects_taught: "Mathematics, Physics, Chemistry",
-          years_experience: Faker::Number.between(from: 1, to: 30),
-          qualification: "Master's in Education"
+          teacher: {
+            subjects: [ "Mathematics", "Physics", "Chemistry" ],
+            years_of_experience: Faker::Number.between(from: 1, to: 30),
+            qualification: "Master's in Education"
+          }
         }
       end
     end
 
     trait :student do
-      student_details do
+      roll_specific_detail do
         {
-          grade_level: "Grade #{Faker::Number.between(from: 1, to: 12)}",
-          enrollment_date: Faker::Date.between(from: 2.years.ago, to: Date.today).to_s,
-          parent_contact: "+#{Faker::Number.number(digits: 12)}"
+          student: {
+            grade: "#{Faker::Number.between(from: 1, to: 12)}",
+            section: "A",
+            roll_number: "#{Faker::Number.between(from: 1, to: 50)}",
+            enrollment_date: Faker::Date.between(from: 2.years.ago, to: Date.today).to_s
+          }
         }
       end
     end

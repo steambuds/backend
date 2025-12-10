@@ -21,15 +21,12 @@ class CreateProfiles < ActiveRecord::Migration[8.0]
       t.date :date_of_birth
 
       # JSON fields for flexible teacher/student-specific data
-      # teacher_detail: {years_of_experience, qualification, subjects: []}
-      t.jsonb :teacher_detail
+      # instructor_detail: {years_of_experience, qualification, subjects: []}
+      # student_details: {grade, section, roll_number, enrollment_date}
+      t.jsonb :roll_specific_detail
 
       # experience: [{type, description, duration, organization}]
       t.jsonb :experience
-
-      # student_details: {grade, section, roll_number, enrollment_date}
-      # Note: School association is handled via school_users join table
-      t.jsonb :student_details
 
       # Contact information
       t.string :alternate_mobile_number

@@ -6,6 +6,7 @@ class CreateAttendances < ActiveRecord::Migration[8.0]
       t.uuid :group_id, null: false
       t.uuid :user_id, null: false
       t.datetime :attendance_at, null: false
+      t.integer :status, null: false
 
       # Audit trail
       t.uuid :created_by

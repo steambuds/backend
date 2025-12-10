@@ -3,13 +3,9 @@ require 'rails_helper'
 RSpec.describe "Api::V1::Hello", type: :request do
   describe "GET /index" do
     let(:user) { create(:user) }
-    let(:admin_user) { create(:user, username: "admin", email: "admin@example.com") }
+    let(:admin_user) { create(:user, :admin, username: "admin", email: "admin@example.com") }
     let(:token) { JsonWebToken.encode(user_id: user.id) }
     let(:admin_token) { JsonWebToken.encode(user_id: admin_user.id) }
-
-    before do
-      admin_user.user_roles.create!(role: :admin)
-    end
 
     context 'with valid JWT token and admin role' do
       before do
@@ -273,13 +269,9 @@ RSpec.describe "Api::V1::Hello", type: :request do
   describe "DELETE /destroy" do
     let(:hello) { create(:hello) }
     let(:user) { create(:user) }
-    let(:admin_user) { create(:user, username: "admin", email: "admin@example.com") }
+    let(:admin_user) { create(:user, :admin, username: "admin", email: "admin@example.com") }
     let(:token) { JsonWebToken.encode(user_id: user.id) }
     let(:admin_token) { JsonWebToken.encode(user_id: admin_user.id) }
-
-    before do
-      admin_user.user_roles.create!(role: :admin)
-    end
 
     context 'with admin role' do
       it "deletes the hello" do
