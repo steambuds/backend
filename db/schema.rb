@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_10_060514) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_10_100712) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -19,7 +19,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_060514) do
     t.datetime "created_at", null: false
     t.uuid "created_by"
     t.uuid "group_id", null: false
-    t.integer "status"
+    t.integer "status", null: false
     t.datetime "updated_at", null: false
     t.uuid "updated_by"
     t.uuid "user_id", null: false
@@ -75,9 +75,8 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_060514) do
     t.string "gender"
     t.string "mother_name"
     t.string "name"
+    t.jsonb "roll_specific_detail"
     t.integer "steamer_id"
-    t.jsonb "student_details"
-    t.jsonb "teacher_detail"
     t.datetime "updated_at", null: false
     t.uuid "updated_by"
     t.index ["steamer_id"], name: "index_profiles_on_steamer_id", unique: true
@@ -121,16 +120,6 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_060514) do
     t.index ["steamer_id"], name: "index_schools_on_steamer_id", unique: true
   end
 
-  create_table "user_roles", primary_key: ["user_id", "role"], force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.uuid "created_by"
-    t.string "role", null: false
-    t.datetime "updated_at", null: false
-    t.uuid "updated_by"
-    t.uuid "user_id", null: false
-    t.index ["user_id", "role"], name: "index_user_roles_on_user_id_and_role", unique: true
-  end
-
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.uuid "created_by"
@@ -138,11 +127,22 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_060514) do
     t.string "encrypted_password"
     t.string "mobile_number"
     t.datetime "remember_created_at"
+    t.string "roles", default: [], array: true
     t.datetime "updated_at", null: false
     t.uuid "updated_by"
     t.string "username"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["mobile_number"], name: "index_users_on_mobile_number"
+  end
+
+  create_table "versions", force: :cascade do |t|
+    t.datetime "created_at"
+    t.string "event", null: false
+    t.bigint "item_id", null: false
+    t.string "item_type", null: false
+    t.text "object"
+    t.string "whodunnit"
+    t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
   add_foreign_key "attendances", "groups"
@@ -167,9 +167,6 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_060514) do
   add_foreign_key "school_users", "users", column: "updated_by"
   add_foreign_key "schools", "users", column: "created_by"
   add_foreign_key "schools", "users", column: "updated_by"
-  add_foreign_key "user_roles", "users"
-  add_foreign_key "user_roles", "users", column: "created_by"
-  add_foreign_key "user_roles", "users", column: "updated_by"
   add_foreign_key "users", "users", column: "created_by"
   add_foreign_key "users", "users", column: "updated_by"
 end

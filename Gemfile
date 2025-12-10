@@ -53,3 +53,4 @@ end
 
 gem "bcrypt", "~> 3.1"
 gem "jwt"
+gem "paper_trail"

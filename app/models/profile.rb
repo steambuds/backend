@@ -1,4 +1,6 @@
 class Profile < ApplicationRecord
+  has_paper_trail
+
   self.primary_key = :id
   belongs_to :user, foreign_key: :id
 

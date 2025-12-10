@@ -8,6 +8,7 @@ class CreateUsers < ActiveRecord::Migration[8.0]
       t.string :email
       t.string :encrypted_password
       t.string :mobile_number
+      t.string :roles, array: true, default: []
 
       ## Rememberable
       t.datetime :remember_created_at

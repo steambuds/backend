@@ -89,12 +89,6 @@ RSpec.describe User, type: :model do
   end
 
   describe "associations" do
-    it "has many user_roles with dependent destroy" do
-      user = create(:user)
-      create(:user_role, user: user)
-      expect { user.destroy }.to change { UserRole.count }.by(-1)
-    end
-
     it "has many refresh_tokens with dependent destroy" do
       user = create(:user)
       create(:refresh_token, user: user)
@@ -103,7 +97,7 @@ RSpec.describe User, type: :model do
 
     it "has one profile with dependent destroy" do
       user = create(:user)
-      create(:profile, :teacher, user: user)
+      profile = Profile.create!(id: user.id, name: "Test User")
       expect { user.destroy }.to change { Profile.count }.by(-1)
     end
 
@@ -126,23 +120,125 @@ RSpec.describe User, type: :model do
       expect(user.roles).to eq([])
     end
 
-    it "returns all roles assigned to the user" do
-      create(:user_role, user: user, role: :admin)
-      create(:user_role, user: user, role: :manager)
-      expect(user.roles).to match_array([ 'admin', 'manager' ])
+    it "returns roles as symbols" do
+      user.roles = [:admin, :instructor]
+      user.save
+      expect(user.roles).to match_array([:admin, :instructor])
+    end
+
+    it "stores roles as strings in database" do
+      user.roles = [:admin, :instructor]
+      user.save
+      expect(user.read_attribute(:roles)).to match_array(["admin", "instructor"])
     end
   end
 
   describe "#has_role?" do
     let(:user) { create(:user) }
-    let!(:user_role) { create(:user_role, user: user, role: :admin) }
+
+    before do
+      user.roles = [:admin]
+      user.save
+    end
 
     it "returns true if the user has the role" do
       expect(user.has_role?(:admin)).to be true
     end
 
     it "returns false if the user does not have the role" do
-      expect(user.has_role?(:manager)).to be false
+      expect(user.has_role?(:instructor)).to be false
+    end
+  end
+
+  describe "#add_role" do
+    let(:user) { create(:user) }
+
+    it "adds a role to the user" do
+      user.add_role(:admin)
+      expect(user.roles).to include(:admin)
+    end
+
+    it "does not add duplicate roles" do
+      user.add_role(:admin)
+      user.add_role(:admin)
+      expect(user.roles.count(:admin)).to eq(1)
+    end
+
+    it "validates role is in Role enum" do
+      result = user.add_role(:invalid_role)
+      expect(result).to be false
+    end
+  end
+
+  describe "#remove_role" do
+    let(:user) { create(:user) }
+
+    before do
+      user.roles = [:admin, :instructor]
+      user.save
+    end
+
+    it "removes a role from the user" do
+      user.remove_role(:admin)
+      expect(user.roles).not_to include(:admin)
+      expect(user.roles).to include(:instructor)
+    end
+
+    it "returns false if user doesn't have the role" do
+      result = user.remove_role(:facilitator)
+      expect(result).to be false
+    end
+  end
+
+  describe "PaperTrail" do
+    it "creates a version on create" do
+      expect {
+        create(:user)
+      }.to change { PaperTrail::Version.count }.by(1)
+    end
+
+    it "creates a version on update" do
+      user = create(:user)
+
+      expect {
+        user.update_columns(username: "newusername")
+      }.to change { user.versions.count }.by(1)
+    end
+
+    it "creates a version on destroy" do
+      user = create(:user)
+
+      expect {
+        user.destroy
+      }.to change { PaperTrail::Version.count }.by(1)
+    end
+
+    it "records the changeset" do
+      user = create(:user)
+      user.update_columns(username: "newusername")
+
+      version = user.versions.last
+      expect(version.changeset).to include("username")
+      expect(version.changeset["username"]).to eq([user.reload.username, "newusername"].reverse)
+    end
+
+    it "tracks role changes" do
+      user = create(:user)
+      user.update!(roles: [:admin, :instructor])
+
+      version = user.versions.last
+      expect(version.changeset).to include("roles")
+    end
+
+    it "records whodunnit when user is set" do
+      admin = create(:user)
+
+      user = nil
+      PaperTrail.request(whodunnit: admin.id) do
+        user = create(:user)
+      end
+
+      expect(user.versions.last.whodunnit).to eq(admin.id.to_s)
     end
   end
 end

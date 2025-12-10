@@ -37,8 +37,8 @@ module Api
       def add_role
         role = params[:role]&.to_sym
 
-        unless UserRole.roles.keys.include?(role.to_s)
-          return render json: { error: "Invalid role. Valid roles are: #{UserRole.roles.keys.join(', ')}" },
+        unless Role.valid?(role)
+          return render json: { error: "Invalid role. Valid roles are: #{Role.values.join(', ')}" },
                        status: :unprocessable_entity
         end
 
@@ -46,9 +46,9 @@ module Api
           return render json: { error: "User already has this role" }, status: :unprocessable_entity
         end
 
-        user_role = @user.user_roles.build(role: role)
+        @user.add_role(role)
 
-        if user_role.save
+        if @user.save
           render json: {
             message: "Role added successfully",
             user: {
@@ -58,7 +58,7 @@ module Api
             }
           }, status: :ok
         else
-          render json: { errors: user_role.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
@@ -66,13 +66,13 @@ module Api
       def remove_role
         role = params[:role]&.to_sym
 
-        user_role = @user.user_roles.find_by(role: role)
-
-        if user_role.nil?
+        unless @user.has_role?(role)
           return render json: { error: "User does not have this role" }, status: :not_found
         end
 
-        user_role.destroy
+        @user.remove_role(role)
+        @user.save
+
         render json: {
           message: "Role removed successfully",
           user: {
@@ -92,35 +92,34 @@ module Api
 
         # Convert to array, handling both array and string inputs, and filter out empty strings
         roles = params[:roles].is_a?(Array) ? params[:roles] : Array(params[:roles])
-        roles = roles.reject(&:blank?)
+        roles = roles.reject(&:blank?).map(&:to_sym)
 
         # Validate all roles (skip validation if empty array)
         if roles.any?
-          invalid_roles = roles.reject { |role| UserRole.roles.keys.include?(role.to_s) }
+          invalid_roles = roles.reject { |role| Role.valid?(role) }
           if invalid_roles.any?
             return render json: {
               error: "Invalid roles: #{invalid_roles.join(', ')}",
-              valid_roles: UserRole.roles.keys
+              valid_roles: Role.values
             }, status: :unprocessable_entity
           end
         end
 
-        # Remove all existing roles
-        @user.user_roles.destroy_all
+        # Set new roles (this replaces all existing roles)
+        @user.roles = roles
 
-        # Add new roles
-        roles.each do |role|
-          @user.user_roles.create!(role: role.to_sym)
+        if @user.save
+          render json: {
+            message: "Roles updated successfully",
+            user: {
+              id: @user.id,
+              username: @user.username,
+              roles: @user.roles
+            }
+          }, status: :ok
+        else
+          render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
         end
-
-        render json: {
-          message: "Roles updated successfully",
-          user: {
-            id: @user.id,
-            username: @user.username,
-            roles: @user.reload.roles
-          }
-        }, status: :ok
       end
 
       private
@@ -143,7 +142,8 @@ module Api
       end
 
       def filter_by_role(users)
-        users.joins(:user_roles).where(user_roles: { role: params[:role] }).distinct
+        # Filter users who have the specified role in their roles array
+        users.where("? = ANY(roles)", params[:role].to_s)
       end
 
       def filter_by_profile_type(users)

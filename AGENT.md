@@ -106,6 +106,56 @@ Run specific test:
 bundle exec rspec spec/models/user_spec.rb:10
 ```
 
+## Audit Trail & History Tracking (PaperTrail)
+
+This project uses **PaperTrail** gem for comprehensive audit trails and version history of all model changes.
+
+### Features
+- **Complete History:** Tracks all creates, updates, and deletes
+- **Who Changed It:** Records which user made each change (whodunnit)
+- **What Changed:** Stores before/after values (changeset)
+- **Time Travel:** Ability to revert to any previous version
+
+### Models with Tracking
+All major models have `has_paper_trail` enabled:
+- User
+- Profile
+- School
+- SchoolUser
+- Group
+- GroupUser
+- Attendance
+
+### Usage Examples
+
+**View version history:**
+```ruby
+user = User.find(id)
+user.versions                    # All versions
+user.versions.count              # Number of changes
+user.versions.last               # Most recent change
+user.versions.last.changeset     # What changed
+user.versions.last.whodunnit     # Who made the change (user ID)
+```
+
+**Revert to previous version:**
+```ruby
+user.paper_trail.previous_version  # Get previous state
+user.paper_trail.version_at(timestamp)  # State at specific time
+```
+
+**Track specific changes:**
+```ruby
+attendance = Attendance.find(id)
+attendance.versions.where(event: 'update')  # Only updates
+attendance.versions.last.reify              # Restore previous version
+```
+
+### Configuration
+- Configured in `ApplicationController` with `set_paper_trail_whodunnit`
+- Automatically tracks `current_user.id` for authenticated requests
+- Versions stored in `versions` table with polymorphic association
+
 ## Project Conventions
 
 ### File Naming
@@ -161,15 +211,16 @@ The application implements a complete JWT-based authentication system with refre
 - Uses bcrypt for password encryption (not Rails' has_secure_password)
 - Custom `encrypt_password` callback before save
 - Password validation: minimum 8 chars, requires uppercase, lowercase, and digit
-- Has many user_roles for flexible role assignment
+- Roles stored as array column on users table (supports multiple roles per user)
 - UUID primary keys
 - `has_role?(role_name)` method to check if user has a specific role
+- `add_role(role)` and `remove_role(role)` methods to manage roles (don't auto-save)
 
-**UserRole Model** (app/models/user_role.rb)
-- Join table for User and roles using composite PK on (user_id, role)
-- Enum role: [:admin, :server_machine, :manager]
-- Each user can have multiple roles
-- No separate id column, uses composite primary key
+**Role Enum** (app/enums/role.rb)
+- Centralized role definitions as Ruby symbols
+- Available roles: :admin, :system_user, :instructor, :facilitator, :student
+- Used across User.roles, GroupUser.relation, and SchoolUser.relation
+- Validates that roles are from approved list
 
 **RefreshToken Model** (app/models/refresh_token.rb)
 - Generates secure random hex token on creation
@@ -201,27 +252,27 @@ The application implements a complete JWT-based authentication system with refre
 
 **Group Management Models**
 - **Group:** (app/models/group.rb) Manages class/study groups. Has many users through group_users.
-- **GroupUser:** (app/models/group_user.rb) Join table with roles (student/instructor/facilitator).
-- **Attendance:** (app/models/attendance.rb) Tracks student attendance with status enum (present/absent/late/excused) and precise datetime.
+- **GroupUser:** (app/models/group_user.rb) Join table with relation field. Validates user has matching role before assignment.
+- **SchoolUser:** (app/models/school_user.rb) Join table for school assignments. Validates user has matching role before assignment.
+- **Attendance:** (app/models/attendance.rb) Tracks student attendance with status enum (present/absent/late/excused), includes created_by/updated_by audit trail.
 
 ### Database Schema
 
 The database uses UUID primary keys and follows an audit trail pattern with `created_by` and `updated_by` fields on most tables (except hellos). Complete schema documented in `database.canvas`.
 
 **Core Tables:**
-- **users:** uuid id (PK), username, email (unique indexed), encrypted_password, mobile_number (indexed), created_by, updated_by
-- **profiles:** Composite PK where id = users.id, contains JSONB fields (teacher_detail, student_details, experience), steamer_id (unique), name, bio, avatar_url, father_name, mother_name, gender, alternate_mobile_number
-- **user_roles:** Composite PK on (user_id, role), no separate id column
+- **users:** uuid id (PK), username, email (unique indexed), encrypted_password, mobile_number (indexed), roles (text array), created_by, updated_by
+- **profiles:** Composite PK where id = users.id, contains JSONB field (roll_specific_detail), steamer_id (unique), name, bio, avatar_url, father_name, mother_name, gender, alternate_mobile_number, date_of_birth
 - **refresh_tokens:** uuid id, user_id FK, token (indexed), expires_at
 
 **School Management:**
-- **schools:** uuid id, steamer_id (unique), school_name, district, city_village, pincode, landmark, address
-- **school_users:** Composite PK on (school_id, user_id), relation enum (instructor/facilitator/student/principal)
+- **schools:** uuid id, steamer_id (unique), school_name, district, city_village, pincode, landmark, address, created_by, updated_by
+- **school_users:** Composite PK on (school_id, user_id), relation (string - validated against Role enum), created_by, updated_by
 
 **Group & Attendance:**
-- **groups:** uuid id, name, about, grades, same_school boolean
-- **group_users:** Composite PK on (group_id, user_id), relation enum (student/instructor/facilitator)
-- **attendances:** uuid id, group_id, user_id, attendance_at (all indexed), status (enum)
+- **groups:** uuid id, name, about, grades, same_school boolean, created_by, updated_by
+- **group_users:** Composite PK on (group_id, user_id), relation (string - validated against Role enum), created_by, updated_by
+- **attendances:** uuid id, group_id, user_id, attendance_at (all indexed), status (enum: 0=present, 1=absent, 2=late, 3=excused), created_by, updated_by
 
 **Contact Form:**
 - **hellos:** uuid id, name, email, mobile_number, description, category (intentionally no audit fields)
@@ -258,9 +309,11 @@ end
 The application includes role-based authorization through the **Authorizable concern** (app/controllers/concerns/authorizable.rb).
 
 **Available Roles:**
-- `:admin` - Administrator role with full access
-- `:manager` - Manager role with elevated permissions
-- `:server_machine` - Server/machine role for automated processes
+- `:admin` - Administrator role with full access to all protected endpoints
+- `:system_user` - System/automated process role
+- `:instructor` - Teacher role for leading groups and marking attendance
+- `:facilitator` - Community facilitator role for supporting groups
+- `:student` - Student role for group membership and attendance tracking
 
 **Authorizable Concern:**
 - Included in ApplicationController

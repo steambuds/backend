@@ -1,4 +1,6 @@
 class School < ApplicationRecord
+  has_paper_trail
+
   has_many :school_users, dependent: :destroy
   has_many :users, through: :school_users
 

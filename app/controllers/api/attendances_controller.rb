@@ -38,6 +38,7 @@ module Api
       attendance_at = DateTime.parse(params[:date])
       attendances_data = params[:attendances]
 
+      records_created = 0
       ActiveRecord::Base.transaction do
         attendances_data.each do |attendance_data|
           attendance = Attendance.find_or_initialize_by(
@@ -46,11 +47,23 @@ module Api
             attendance_at: attendance_at
           )
           attendance.status = attendance_data[:status]
+
+          # Track who created/updated the record
+          if attendance.new_record?
+            attendance.created_by = current_user.id
+          end
+          attendance.updated_by = current_user.id
+
           attendance.save!
+          records_created += 1
         end
       end
 
-      render json: { message: "Attendance recorded" }, status: :ok
+      render json: {
+        message: "Attendance recorded successfully",
+        date: attendance_at,
+        records_created: records_created
+      }, status: :ok
     rescue ArgumentError
       render json: { error: "Invalid date format" }, status: :unprocessable_entity
     rescue ActiveRecord::RecordInvalid => e
