@@ -106,6 +106,17 @@ RSpec.describe User, type: :model do
       create(:profile, :teacher, user: user)
       expect { user.destroy }.to change { Profile.count }.by(-1)
     end
+
+    it "has many group_users" do
+      association = described_class.reflect_on_association(:group_users)
+      expect(association.macro).to eq :has_many
+    end
+
+    it "has many groups through group_users" do
+      association = described_class.reflect_on_association(:groups)
+      expect(association.macro).to eq :has_many
+      expect(association.options[:through]).to eq :group_users
+    end
   end
 
   describe "#roles" do

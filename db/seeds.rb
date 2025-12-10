@@ -1,277 +1,323 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
+# Clear existing data
+puts "Cleaning database..."
+Attendance.destroy_all
+GroupUser.destroy_all
+Group.destroy_all
+SchoolUser.destroy_all
+School.destroy_all
+RefreshToken.destroy_all
+UserRole.destroy_all
+Profile.destroy_all
+User.destroy_all
 
-# Only seed data in development environment
-if Rails.env.development?
-  # Clear existing data (optional - comment out if you want to preserve existing data)
-  puts "Clearing existing data..."
-  UserRole.destroy_all
-  Profile.destroy_all
-  RefreshToken.destroy_all
-  User.destroy_all
+puts "Database cleaned."
 
-  puts "Creating admin user..."
-  # Create admin user - ghanshyam
-  admin = User.create!(
-    username: "ghanshyam",
-    email: "ghanshyam@steambuds.com",
-    mobile_number: "+919876543210",
-    password: "Admin123"
+# Helper to create user
+def create_user(username, role_name = nil, profile_data = {})
+  email = "#{username.downcase.gsub(' ', '.')}@steambuds.com"
+  user = User.create!(
+    username: username,
+    email: email,
+    password: "Password123",
+    mobile_number: "+91#{rand(6000000000..9999999999)}"
   )
 
-  # Assign admin role
-  UserRole.create!(user: admin, role: :admin)
+  if role_name
+    UserRole.create!(user: user, role: role_name)
+  end
 
-  # Create admin profile
   Profile.create!(
-    user: admin,
-    user_type: :teacher,
-    bio: "Administrator and lead instructor at Steam Buds",
-    subjects_taught: "Computer Science, Mathematics, Physics",
-    years_experience: 10,
-    qualification: "PhD in Computer Science",
-    phone: "+919876543210",
-    address: "123 Admin Street, Tech City",
-    date_of_birth: Date.new(1985, 5, 15)
+    user: user,
+    name: username,
+    steamer_id: 9000000 + User.count,
+    bio: "Bio for #{username}",
+    **profile_data
   )
 
-  puts "Admin user 'ghanshyam' created successfully!"
-
-  puts "Creating teacher users..."
-  # Create 2 teacher users
-  teachers_data = [
-    {
-      username: "sarah_johnson",
-      email: "sarah.johnson@steambuds.com",
-      mobile_number: "+919876543211",
-      password: "Teacher123",
-      bio: "Passionate about teaching mathematics and helping students excel",
-      subjects_taught: "Mathematics, Statistics",
-      years_experience: 8,
-      qualification: "Masters in Mathematics Education",
-      phone: "+919876543211",
-      address: "456 Teacher Lane, Education City",
-      date_of_birth: Date.new(1988, 3, 20)
-    },
-    {
-      username: "michael_chen",
-      email: "michael.chen@steambuds.com",
-      mobile_number: "+919876543212",
-      password: "Teacher123",
-      bio: "Science educator with focus on hands-on learning and experiments",
-      subjects_taught: "Physics, Chemistry, Biology",
-      years_experience: 5,
-      qualification: "Masters in Science Education",
-      phone: "+919876543212",
-      address: "789 Science Boulevard, Research Park",
-      date_of_birth: Date.new(1990, 11, 8)
-    }
-  ]
-
-  teachers_data.each do |teacher_data|
-    user = User.create!(
-      username: teacher_data[:username],
-      email: teacher_data[:email],
-      mobile_number: teacher_data[:mobile_number],
-      password: teacher_data[:password]
-    )
-
-    # Assign manager role to teachers (they can manage their classes)
-    UserRole.create!(user: user, role: :manager)
-
-    Profile.create!(
-      user: user,
-      user_type: :teacher,
-      bio: teacher_data[:bio],
-      subjects_taught: teacher_data[:subjects_taught],
-      years_experience: teacher_data[:years_experience],
-      qualification: teacher_data[:qualification],
-      phone: teacher_data[:phone],
-      address: teacher_data[:address],
-      date_of_birth: teacher_data[:date_of_birth]
-    )
-
-    puts "Teacher '#{teacher_data[:username]}' created successfully!"
-  end
-
-  puts "Creating student users..."
-  # Create 10 student users
-  students_data = [
-    {
-      username: "emma_wilson",
-      email: "emma.wilson@student.steambuds.com",
-      mobile_number: "+919876543220",
-      password: "Student123",
-      bio: "Enthusiastic learner interested in mathematics and science",
-      grade_level: "10th Grade",
-      enrollment_date: Date.new(2023, 9, 1),
-      parent_contact: "+919876543221",
-      phone: "+919876543220",
-      address: "101 Student Street, Learning City",
-      date_of_birth: Date.new(2010, 6, 15)
-    },
-    {
-      username: "liam_patel",
-      email: "liam.patel@student.steambuds.com",
-      mobile_number: "+919876543222",
-      password: "Student123",
-      bio: "Loves coding and robotics",
-      grade_level: "11th Grade",
-      enrollment_date: Date.new(2022, 9, 1),
-      parent_contact: "+919876543223",
-      phone: "+919876543222",
-      address: "102 Student Street, Learning City",
-      date_of_birth: Date.new(2009, 4, 22)
-    },
-    {
-      username: "olivia_martinez",
-      email: "olivia.martinez@student.steambuds.com",
-      mobile_number: "+919876543224",
-      password: "Student123",
-      bio: "Aspiring scientist with passion for chemistry",
-      grade_level: "12th Grade",
-      enrollment_date: Date.new(2021, 9, 1),
-      parent_contact: "+919876543225",
-      phone: "+919876543224",
-      address: "103 Student Street, Learning City",
-      date_of_birth: Date.new(2008, 1, 10)
-    },
-    {
-      username: "noah_anderson",
-      email: "noah.anderson@student.steambuds.com",
-      mobile_number: "+919876543226",
-      password: "Student123",
-      bio: "Math enthusiast and competitive programmer",
-      grade_level: "11th Grade",
-      enrollment_date: Date.new(2022, 9, 1),
-      parent_contact: "+919876543227",
-      phone: "+919876543226",
-      address: "104 Student Street, Learning City",
-      date_of_birth: Date.new(2009, 9, 5)
-    },
-    {
-      username: "ava_thompson",
-      email: "ava.thompson@student.steambuds.com",
-      mobile_number: "+919876543228",
-      password: "Student123",
-      bio: "Creative thinker interested in arts and technology",
-      grade_level: "9th Grade",
-      enrollment_date: Date.new(2024, 9, 1),
-      parent_contact: "+919876543229",
-      phone: "+919876543228",
-      address: "105 Student Street, Learning City",
-      date_of_birth: Date.new(2011, 7, 18)
-    },
-    {
-      username: "ethan_rodriguez",
-      email: "ethan.rodriguez@student.steambuds.com",
-      mobile_number: "+919876543230",
-      password: "Student123",
-      bio: "Sports enthusiast and future engineer",
-      grade_level: "10th Grade",
-      enrollment_date: Date.new(2023, 9, 1),
-      parent_contact: "+919876543231",
-      phone: "+919876543230",
-      address: "106 Student Street, Learning City",
-      date_of_birth: Date.new(2010, 2, 28)
-    },
-    {
-      username: "sophia_lee",
-      email: "sophia.lee@student.steambuds.com",
-      mobile_number: "+919876543232",
-      password: "Student123",
-      bio: "Loves reading and biology",
-      grade_level: "12th Grade",
-      enrollment_date: Date.new(2021, 9, 1),
-      parent_contact: "+919876543233",
-      phone: "+919876543232",
-      address: "107 Student Street, Learning City",
-      date_of_birth: Date.new(2008, 12, 3)
-    },
-    {
-      username: "jackson_kim",
-      email: "jackson.kim@student.steambuds.com",
-      mobile_number: "+919876543234",
-      password: "Student123",
-      bio: "Curious mind interested in physics and astronomy",
-      grade_level: "11th Grade",
-      enrollment_date: Date.new(2022, 9, 1),
-      parent_contact: "+919876543235",
-      phone: "+919876543234",
-      address: "108 Student Street, Learning City",
-      date_of_birth: Date.new(2009, 8, 14)
-    },
-    {
-      username: "mia_nguyen",
-      email: "mia.nguyen@student.steambuds.com",
-      mobile_number: "+919876543236",
-      password: "Student123",
-      bio: "Budding writer and literature lover",
-      grade_level: "9th Grade",
-      enrollment_date: Date.new(2024, 9, 1),
-      parent_contact: "+919876543237",
-      phone: "+919876543236",
-      address: "109 Student Street, Learning City",
-      date_of_birth: Date.new(2011, 3, 25)
-    },
-    {
-      username: "lucas_davis",
-      email: "lucas.davis@student.steambuds.com",
-      mobile_number: "+919876543238",
-      password: "Student123",
-      bio: "Tech-savvy student passionate about AI and machine learning",
-      grade_level: "12th Grade",
-      enrollment_date: Date.new(2021, 9, 1),
-      parent_contact: "+919876543239",
-      phone: "+919876543238",
-      address: "110 Student Street, Learning City",
-      date_of_birth: Date.new(2008, 10, 30)
-    }
-  ]
-
-  students_data.each do |student_data|
-    user = User.create!(
-      username: student_data[:username],
-      email: student_data[:email],
-      mobile_number: student_data[:mobile_number],
-      password: student_data[:password]
-    )
-
-    # Students don't have a specific role in UserRole enum, so we don't create a user_role for them
-    # But they have student profile
-
-    Profile.create!(
-      user: user,
-      user_type: :student,
-      bio: student_data[:bio],
-      grade_level: student_data[:grade_level],
-      enrollment_date: student_data[:enrollment_date],
-      parent_contact: student_data[:parent_contact],
-      phone: student_data[:phone],
-      address: student_data[:address],
-      date_of_birth: student_data[:date_of_birth]
-    )
-
-    puts "Student '#{student_data[:username]}' created successfully!"
-  end
-
-  puts "\n" + "=" * 60
-  puts "Seed data created successfully!"
-  puts "=" * 60
-  puts "\nSummary:"
-  puts "  - 1 Admin user (ghanshyam) with admin role"
-  puts "  - 2 Teacher users with manager role"
-  puts "  - 10 Student users"
-  puts "\nTotal users: #{User.count}"
-  puts "Total profiles: #{Profile.count}"
-  puts "Total user roles: #{UserRole.count}"
-  puts "\nLogin credentials for all users:"
-  puts "  Admin: ghanshyam / Admin123"
-  puts "  Teachers: sarah_johnson, michael_chen / Teacher123"
-  puts "  Students: [username] / Student123"
-  puts "=" * 60
-else
-  puts "Skipping seed data - only runs in development environment"
-  puts "Current environment: #{Rails.env}"
+  puts "Created user: #{username} (#{role_name || 'regular user'})"
+  user
 end
+
+puts "\n=== Creating Users ==="
+
+# 1. Create Admin
+admin = create_user("Ghanshyam", "admin", {
+  bio: "System Administrator",
+  gender: "male"
+})
+
+# 2. Create Teachers (2)
+teacher1 = create_user("Priya Sharma", nil, {
+  teacher_detail: {
+    qualification: "B.Ed in Mathematics",
+    years_of_experience: 5,
+    subjects: ["Mathematics", "Physics"]
+  },
+  gender: "female"
+})
+
+teacher2 = create_user("Rajesh Kumar", nil, {
+  teacher_detail: {
+    qualification: "M.Sc in Biology",
+    years_of_experience: 8,
+    subjects: ["Biology", "Chemistry", "Science"]
+  },
+  gender: "male"
+})
+
+# 3. Create Facilitators (2)
+facilitator1 = create_user("Anjali Verma", nil, {
+  bio: "Community Facilitator - STEAM Program Coordinator",
+  gender: "female"
+})
+
+facilitator2 = create_user("Vikram Singh", nil, {
+  bio: "Field Facilitator - Student Support Specialist",
+  gender: "male"
+})
+
+# 4. Create Guardians (2 - regular users without roles)
+guardian1 = create_user("Ramesh Patel", nil, {
+  bio: "Parent of Aarav Patel",
+  gender: "male"
+})
+
+guardian2 = create_user("Sunita Reddy", nil, {
+  bio: "Parent of Diya Reddy",
+  gender: "female"
+})
+
+# 5. Create Students (14)
+student_names = [
+  { name: "Aarav Patel", gender: "male", grade: "9", section: "A" },
+  { name: "Diya Reddy", gender: "female", grade: "9", section: "A" },
+  { name: "Arjun Mehta", gender: "male", grade: "9", section: "B" },
+  { name: "Ishita Gupta", gender: "female", grade: "9", section: "B" },
+  { name: "Rohan Das", gender: "male", grade: "10", section: "A" },
+  { name: "Sneha Iyer", gender: "female", grade: "10", section: "A" },
+  { name: "Kabir Joshi", gender: "male", grade: "10", section: "B" },
+  { name: "Ananya Nair", gender: "female", grade: "10", section: "B" },
+  { name: "Aditya Singh", gender: "male", grade: "9", section: "C" },
+  { name: "Meera Desai", gender: "female", grade: "9", section: "C" },
+  { name: "Karan Malhotra", gender: "male", grade: "10", section: "C" },
+  { name: "Pooja Sharma", gender: "female", grade: "10", section: "C" },
+  { name: "Vihan Kapoor", gender: "male", grade: "9", section: "A" },
+  { name: "Riya Bansal", gender: "female", grade: "10", section: "A" }
+]
+
+students = student_names.map do |s|
+  create_user(s[:name], nil, {
+    student_details: {
+      grade: s[:grade],
+      section: s[:section],
+      roll_number: rand(1..50),
+      enrollment_date: Date.today - rand(365..730).days
+    },
+    gender: s[:gender],
+    date_of_birth: Date.today - rand(14..16).years
+  })
+end
+
+puts "\n=== Creating Schools ==="
+
+# Create 3 Schools
+school1 = School.create!(
+  steamer_id: 1001,
+  school_name: "Greenwood Public School",
+  district: "North District",
+  city_village: "Mumbai",
+  pincode: 400001,
+  address: "123 MG Road, Andheri"
+)
+puts "Created school: #{school1.school_name}"
+
+school2 = School.create!(
+  steamer_id: 1002,
+  school_name: "Sunnydale High School",
+  district: "South District",
+  city_village: "Mumbai",
+  pincode: 400002,
+  address: "456 Link Road, Bandra"
+)
+puts "Created school: #{school2.school_name}"
+
+school3 = School.create!(
+  steamer_id: 1003,
+  school_name: "Riverside Academy",
+  district: "Central District",
+  city_village: "Mumbai",
+  pincode: 400003,
+  address: "789 SV Road, Goregaon"
+)
+puts "Created school: #{school3.school_name}"
+
+puts "\n=== Assigning Users to Schools ==="
+
+# Assign teachers to schools
+SchoolUser.create!(school: school1, user: teacher1, relation: "instructor")
+puts "  #{teacher1.profile.name} → #{school1.school_name} (instructor)"
+
+SchoolUser.create!(school: school2, user: teacher2, relation: "instructor")
+puts "  #{teacher2.profile.name} → #{school2.school_name} (instructor)"
+
+# Assign facilitators to schools
+SchoolUser.create!(school: school1, user: facilitator1, relation: "facilitator")
+SchoolUser.create!(school: school3, user: facilitator2, relation: "facilitator")
+
+# Assign students to schools
+# School 1: 6 students (all grade 9 & 10, section A)
+school1_students = students[0..5]
+school1_students.each do |student|
+  SchoolUser.create!(school: school1, user: student, relation: "student")
+  puts "  #{student.profile.name} → #{school1.school_name} (student)"
+end
+
+# School 2: 5 students (grade 9 & 10, sections B and C)
+school2_students = students[6..10]
+school2_students.each do |student|
+  SchoolUser.create!(school: school2, user: student, relation: "student")
+  puts "  #{student.profile.name} → #{school2.school_name} (student)"
+end
+
+# School 3: 3 students (remaining)
+school3_students = students[11..13]
+school3_students.each do |student|
+  SchoolUser.create!(school: school3, user: student, relation: "student")
+  puts "  #{student.profile.name} → #{school3.school_name} (student)"
+end
+
+puts "\n=== Creating Groups ==="
+
+# Group 1: All students from SAME school (School 1 - Greenwood)
+group1 = Group.create!(
+  name: "Greenwood Math Champions",
+  about: "Advanced Mathematics study group for Grade 9 & 10 students",
+  grades: "9,10",
+  same_school: true
+)
+GroupUser.create!(group: group1, user: teacher1, relation: "instructor")
+school1_students.each do |student|
+  GroupUser.create!(group: group1, user: student, relation: "student")
+end
+puts "✓ Group 1: #{group1.name}"
+puts "  - Same school: YES (#{school1.school_name})"
+puts "  - Instructor: #{teacher1.profile.name}"
+puts "  - Students: #{school1_students.count}"
+
+# Group 2: Students from DIFFERENT schools (mixed)
+group2 = Group.create!(
+  name: "Inter-School Science Explorers",
+  about: "Multi-school collaborative science project",
+  grades: "9,10",
+  same_school: false
+)
+GroupUser.create!(group: group2, user: teacher2, relation: "instructor")
+GroupUser.create!(group: group2, user: facilitator1, relation: "facilitator")
+# Mix: 3 from School 1, 3 from School 2, 2 from School 3
+mixed_students = [
+  students[0], students[2], students[4],  # School 1
+  students[6], students[7], students[9],  # School 2
+  students[11], students[12]              # School 3
+]
+mixed_students.each do |student|
+  GroupUser.create!(group: group2, user: student, relation: "student")
+end
+puts "✓ Group 2: #{group2.name}"
+puts "  - Same school: NO (Mixed schools)"
+puts "  - Instructor: #{teacher2.profile.name}"
+puts "  - Facilitator: #{facilitator1.profile.name}"
+puts "  - Students: #{mixed_students.count} (from 3 schools)"
+
+# Group 3: Facilitator-led community group (any type)
+group3 = Group.create!(
+  name: "Weekend STEAM Club",
+  about: "Weekend enrichment program - Art, Robotics, and Creative Thinking",
+  grades: "9,10,All",
+  same_school: false
+)
+GroupUser.create!(group: group3, user: facilitator2, relation: "facilitator")
+# Random selection: 6 students
+group3_students = [students[1], students[3], students[5], students[8], students[10], students[13]]
+group3_students.each do |student|
+  GroupUser.create!(group: group3, user: student, relation: "student")
+end
+puts "✓ Group 3: #{group3.name}"
+puts "  - Same school: NO (Community-based)"
+puts "  - Facilitator: #{facilitator2.profile.name}"
+puts "  - Students: #{group3_students.count}"
+
+puts "\n=== Creating Attendance Records ==="
+
+# Generate attendance for the past 30 days (more realistic dataset)
+groups = [group1, group2, group3]
+dates = (0..29).map { |i| Date.today - i.days }
+
+attendance_summary = {}
+
+groups.each_with_index do |group, idx|
+  group_students = group.users.joins(:group_users).where(group_users: { relation: 'student', group_id: group.id })
+  attendance_count = 0
+
+  dates.each_with_index do |date, day_idx|
+    # Skip weekends
+    next if date.saturday? || date.sunday?
+
+    group_students.each do |student|
+      # Realistic attendance patterns:
+      # - 85% present
+      # - 5% late
+      # - 5% excused
+      # - 5% absent
+      # - Add some patterns (e.g., student consistently late on Mondays)
+
+      rand_val = rand(100)
+      status = if date.monday? && [students[2], students[7]].include?(student)
+        :late  # Some students consistently late on Mondays
+      elsif day_idx >= 20 && [students[5], students[10]].include?(student)
+        :excused  # Some students excused for last 10 days (trip/illness)
+      elsif rand_val < 85
+        :present
+      elsif rand_val < 90
+        :late
+      elsif rand_val < 95
+        :excused
+      else
+        :absent
+      end
+
+      Attendance.create!(
+        group: group,
+        user: student,
+        attendance_at: date.to_time.change(hour: 9, min: 0),
+        status: status
+      )
+      attendance_count += 1
+    end
+  end
+
+  attendance_summary["Group #{idx + 1}"] = {
+    name: group.name,
+    students: group_students.count,
+    attendance_records: attendance_count
+  }
+end
+
+puts "\nAttendance Summary:"
+attendance_summary.each do |key, data|
+  puts "  #{key} (#{data[:name]}): #{data[:attendance_records]} records for #{data[:students]} students"
+end
+
+puts "\n" + "="*60
+puts "SEEDING COMPLETED SUCCESSFULLY!"
+puts "="*60
+puts "\nLogin Credentials (all passwords: Password123):"
+puts "  Admin:       #{admin.email}"
+puts "  Teacher 1:   #{teacher1.email}"
+puts "  Teacher 2:   #{teacher2.email}"
+puts "  Facilitator: #{facilitator1.email}"
+puts "\nDatabase Summary:"
+puts "  Users:      #{User.count} (1 admin, 2 teachers, 2 facilitators, 2 guardians, 14 students)"
+puts "  Schools:    #{School.count}"
+puts "  Groups:     #{Group.count}"
+puts "  Attendance: #{Attendance.count} records"
+puts "="*60

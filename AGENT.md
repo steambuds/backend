@@ -199,6 +199,11 @@ The application implements a complete JWT-based authentication system with refre
 - Generates new access token for valid refresh tokens
 - Auto-destroys expired refresh tokens
 
+**Group Management Models**
+- **Group:** (app/models/group.rb) Manages class/study groups. Has many users through group_users.
+- **GroupUser:** (app/models/group_user.rb) Join table with roles (student/instructor/facilitator).
+- **Attendance:** (app/models/attendance.rb) Tracks student attendance with status enum (present/absent/late/excused) and precise datetime.
+
 ### Database Schema
 
 The database uses UUID primary keys and follows an audit trail pattern with `created_by` and `updated_by` fields on most tables (except hellos). Complete schema documented in `database.canvas`.
@@ -216,7 +221,7 @@ The database uses UUID primary keys and follows an audit trail pattern with `cre
 **Group & Attendance:**
 - **groups:** uuid id, name, about, grades, same_school boolean
 - **group_users:** Composite PK on (group_id, user_id), relation enum (student/instructor/facilitator)
-- **attendances:** uuid id, group_id, user_id, attendance_at (all indexed)
+- **attendances:** uuid id, group_id, user_id, attendance_at (all indexed), status (enum)
 
 **Contact Form:**
 - **hellos:** uuid id, name, email, mobile_number, description, category (intentionally no audit fields)

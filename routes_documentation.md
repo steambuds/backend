@@ -634,6 +634,239 @@ curl -X PUT -H "Content-Type: application/json" \
 
 ---
 
+## Group & Attendance Routes
+
+### List Teacher's Groups
+
+Retrieves a list of groups where the current user is an instructor or facilitator. **Requires JWT authentication.**
+
+**Endpoint:** `GET /api/groups`
+
+**Request:**
+```bash
+# Login as a teacher first
+curl -X POST -H "Content-Type: application/json" -d '{
+  "email": "priya.sharma@steambuds.com",
+  "password": "Password123"
+}' http://localhost:8000/api/login
+
+# Use the returned token to get groups
+curl -H "Authorization: Bearer your_access_token" \
+  http://localhost:8000/api/groups
+```
+
+**Response:**
+```json
+[
+  {
+    "id": "group-uuid-1",
+    "name": "Greenwood Math Champions",
+    "about": "Advanced Mathematics study group for Grade 9 & 10 students",
+    "grades": "9,10",
+    "same_school": true,
+    "created_at": "2025-12-10T10:00:00.000Z",
+    "updated_at": "2025-12-10T10:00:00.000Z"
+  },
+  {
+    "id": "group-uuid-2",
+    "name": "Inter-School Science Explorers",
+    "about": "Multi-school collaborative science project",
+    "grades": "9,10",
+    "same_school": false,
+    "created_at": "2025-12-10T10:00:00.000Z",
+    "updated_at": "2025-12-10T10:00:00.000Z"
+  }
+]
+```
+
+**Notes:**
+- Only returns groups where the authenticated user is assigned as an instructor or facilitator
+- Teachers see different groups based on their assignments
+- Empty array `[]` returned if user has no group assignments
+
+---
+
+### Get Group Attendance Dashboard
+
+Retrieves comprehensive attendance data for a specific group, including:
+- List of all students in the group
+- Aggregate attendance statistics (present/absent/late/excused counts)
+- Calendar view with daily attendance status
+
+**Requires JWT authentication and user must be an instructor or facilitator of the group.**
+
+**Endpoint:** `GET /api/groups/:group_id/attendances`
+
+**Request:**
+```bash
+curl -H "Authorization: Bearer your_access_token" \
+  http://localhost:8000/api/groups/group_uuid/attendances
+```
+
+**Response:**
+```json
+[
+  {
+    "user_id": "student-uuid-1",
+    "steamer_id": 9000008,
+    "name": "Aarav Patel",
+    "stats": {
+      "present": 18,
+      "absent": 1,
+      "late": 2,
+      "excused": 1
+    },
+    "calendar": {
+      "2025-12-09": "present",
+      "2025-12-06": "late",
+      "2025-12-05": "present",
+      "2025-12-04": "present",
+      "2025-12-03": "absent",
+      "2025-12-02": "present"
+    }
+  },
+  {
+    "user_id": "student-uuid-2",
+    "steamer_id": 9000009,
+    "name": "Diya Reddy",
+    "stats": {
+      "present": 20,
+      "absent": 0,
+      "late": 1,
+      "excused": 1
+    },
+    "calendar": {
+      "2025-12-09": "present",
+      "2025-12-06": "present",
+      "2025-12-05": "present",
+      "2025-12-04": "late",
+      "2025-12-03": "present",
+      "2025-12-02": "present"
+    }
+  }
+]
+```
+
+**Response Fields:**
+- `user_id`: Student's UUID
+- `steamer_id`: Student's unique steamer ID (used for external integrations)
+- `name`: Student's full name
+- `stats`: Aggregate counts of each attendance status
+  - `present`: Number of days marked present
+  - `absent`: Number of days marked absent
+  - `late`: Number of days marked late
+  - `excused`: Number of days marked excused
+- `calendar`: Map of dates (YYYY-MM-DD) to attendance status
+  - Only includes dates where attendance was recorded
+  - Sorted by date (newest first in the example)
+
+**Notes:**
+- Weekend days are excluded from attendance records
+- Only shows students assigned to the group with `student` relation
+- Calendar includes historical attendance (typically last 30-90 days)
+- Empty calendar `{}` if no attendance recorded yet
+
+---
+
+### Record Attendance (Bulk)
+
+Submits attendance records for multiple students in a group for a specific date. This endpoint supports bulk submission, allowing teachers to mark attendance for an entire class at once.
+
+**Requires JWT authentication and user must be an instructor or facilitator of the group.**
+
+**Endpoint:** `POST /api/groups/:group_id/attendances`
+
+**Request:**
+```bash
+curl -X POST -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_access_token" \
+  -d '{
+  "date": "2025-12-10T09:00:00Z",
+  "attendances": [
+    { "user_id": "student-uuid-1", "status": "present" },
+    { "user_id": "student-uuid-2", "status": "present" },
+    { "user_id": "student-uuid-3", "status": "late" },
+    { "user_id": "student-uuid-4", "status": "absent" },
+    { "user_id": "student-uuid-5", "status": "excused" }
+  ]
+}' http://localhost:8000/api/groups/group_uuid/attendances
+```
+
+**Request Fields:**
+- `date` (required): ISO 8601 datetime string representing when attendance was taken (typically class start time)
+- `attendances` (required): Array of attendance records
+  - `user_id` (required): Student's UUID (must be a student in the group)
+  - `status` (required): One of `present`, `absent`, `late`, `excused`
+
+**Response (Success):**
+```json
+{
+  "message": "Attendance recorded successfully",
+  "date": "2025-12-10T09:00:00.000Z",
+  "records_created": 5
+}
+```
+
+**Response (Validation Error):**
+```json
+{
+  "error": "Validation failed",
+  "details": [
+    "Student with ID student-uuid-999 is not in this group",
+    "Invalid status: 'maybe' - must be one of: present, absent, late, excused"
+  ]
+}
+```
+
+**Response (Unauthorized - not a group instructor/facilitator):**
+```json
+{
+  "error": "Forbidden",
+  "message": "You must be an instructor or facilitator of this group"
+}
+```
+
+**Notes:**
+- If attendance already exists for a student on the given date, it will be updated
+- All students must belong to the specified group
+- Date can be past or present, but typically shouldn't be future
+- Valid statuses: `present`, `absent`, `late`, `excused`
+- Returns error if any user_id doesn't exist or isn't a student in the group
+
+**Example Usage - Daily Attendance Flow:**
+
+```bash
+# 1. Teacher logs in
+TOKEN=$(curl -s -X POST -H "Content-Type: application/json" \
+  -d '{"email": "priya.sharma@steambuds.com", "password": "Password123"}' \
+  http://localhost:8000/api/login | jq -r '.token')
+
+# 2. Get list of teacher's groups
+GROUPS=$(curl -s -H "Authorization: Bearer $TOKEN" \
+  http://localhost:8000/api/groups)
+
+# 3. Get group ID (first group)
+GROUP_ID=$(echo $GROUPS | jq -r '.[0].id')
+
+# 4. Get current attendance dashboard (to see students)
+curl -s -H "Authorization: Bearer $TOKEN" \
+  http://localhost:8000/api/groups/$GROUP_ID/attendances | jq
+
+# 5. Mark today's attendance
+curl -X POST -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d "{
+    \"date\": \"$(date -u +%Y-%m-%dT09:00:00Z)\",
+    \"attendances\": [
+      {\"user_id\": \"student-1-uuid\", \"status\": \"present\"},
+      {\"user_id\": \"student-2-uuid\", \"status\": \"present\"}
+    ]
+  }" \
+  http://localhost:8000/api/groups/$GROUP_ID/attendances
+```
+
+---
+
 ## Authentication & Authorization Notes
 
 - **Access Token:** Short-lived (24 hours), used for API requests
@@ -668,3 +901,6 @@ curl -X PUT -H "Content-Type: application/json" \
 | POST /api/admin/users/:id/roles | Yes | admin |
 | DELETE /api/admin/users/:id/roles/:role | Yes | admin |
 | PUT /api/admin/users/:id/roles | Yes | admin |
+| GET /api/groups | Yes | None (Instructor/Facilitator) |
+| GET /api/groups/:group_id/attendances | Yes | None (Instructor/Facilitator of group) |
+| POST /api/groups/:group_id/attendances | Yes | None (Instructor/Facilitator of group) |
