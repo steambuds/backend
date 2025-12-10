@@ -13,9 +13,26 @@ RSpec.describe GroupUser, type: :model do
     end
   end
 
-  describe 'enums' do
-    it 'defines relation enum' do
-      expect(described_class.defined_enums['relation']).to eq({ "student" => "student", "instructor" => "instructor", "facilitator" => "facilitator" })
+  describe 'validations' do
+    let(:group) { create(:group) }
+    let(:student) { create(:user, roles: [:student]) }
+
+    it 'validates relation is a valid role' do
+      group_user = GroupUser.new(group: group, user: student, relation: "student")
+      expect(group_user).to be_valid
+    end
+
+    it 'rejects invalid relation' do
+      group_user = GroupUser.new(group: group, user: student, relation: "invalid_role")
+      expect(group_user).not_to be_valid
+      expect(group_user.errors[:relation]).to be_present
+    end
+
+    it 'requires user to have the role' do
+      facilitator_user = create(:user, roles: [:facilitator])
+      group_user = GroupUser.new(group: group, user: facilitator_user, relation: "student")
+      expect(group_user).not_to be_valid
+      expect(group_user.errors[:base]).to include("User must have the 'student' role to be assigned as student in a group")
     end
   end
 end

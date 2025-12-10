@@ -1,13 +1,13 @@
 class SchoolUser < ApplicationRecord
   has_paper_trail
 
-  self.primary_key = [:school_id, :user_id]
   belongs_to :school
   belongs_to :user
 
   validates :relation, presence: true
   validate :relation_is_valid_role
   validate :user_has_required_role
+  validates :user_id, uniqueness: { scope: :school_id, message: "is already associated with this school" }
 
   # Convert relation to symbol for consistent usage
   def relation

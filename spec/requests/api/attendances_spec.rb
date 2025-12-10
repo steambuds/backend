@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "Api::Attendances", type: :request do
-  let(:user) { create(:user) } # The teacher
+  let(:user) { create(:user, :instructor) } # The teacher
   let(:headers) { { 'Authorization' => "Bearer #{token}" } }
   let(:token) { JsonWebToken.encode(user_id: user.id) }
   let(:group) { create(:group) }
@@ -11,8 +11,8 @@ RSpec.describe "Api::Attendances", type: :request do
   end
 
   describe "GET /api/groups/:group_id/attendances" do
-    let(:student1) { create(:user) }
-    let(:student2) { create(:user) }
+    let(:student1) { create(:user, :student) }
+    let(:student2) { create(:user, :student) }
     let!(:profile1) { create(:profile, :student, user: student1, name: "Student One", steamer_id: 1001) }
     let!(:profile2) { create(:profile, :student, user: student2, name: "Student Two", steamer_id: 1002) }
 
@@ -59,9 +59,9 @@ RSpec.describe "Api::Attendances", type: :request do
   end
 
   describe "POST /api/groups/:group_id/attendances" do
-    let(:student1) { create(:user) }
-    let(:student2) { create(:user) }
-    
+    let(:student1) { create(:user, :student) }
+    let(:student2) { create(:user, :student) }
+
     before do
       create(:group_user, :student, user: student1, group: group)
       create(:group_user, :student, user: student2, group: group)

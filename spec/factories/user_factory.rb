@@ -3,23 +3,26 @@ FactoryBot.define do
     email { Faker::Internet.unique.email }
     password { "Password123" }
     username { Faker::Internet.unique.username(specifier: 5..8) }
+    roles { [] }
 
-    trait :with_admin_role do
-      after(:create) do |user|
-        create(:user_role, user: user, role: :admin)
-      end
+    trait :admin do
+      roles { [:admin] }
     end
 
-    trait :with_server_machine_role do
-      after(:create) do |user|
-        create(:user_role, user: user, role: :server_machine)
-      end
+    trait :system_user do
+      roles { [:system_user] }
     end
 
-    trait :with_manager_role do
-      after(:create) do |user|
-        create(:user_role, user: user, role: :manager)
-      end
+    trait :instructor do
+      roles { [:instructor] }
+    end
+
+    trait :facilitator do
+      roles { [:facilitator] }
+    end
+
+    trait :student do
+      roles { [:student] }
     end
   end
 end

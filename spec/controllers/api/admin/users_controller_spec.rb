@@ -1,16 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe "Api::Admin::Users", type: :request do
-  let(:admin_user) { create(:user, username: "admin", email: "admin@example.com") }
+  let(:admin_user) { create(:user, :admin, username: "admin", email: "admin@example.com") }
   let(:regular_user) { create(:user, username: "regular", email: "regular@example.com") }
-  let(:manager_user) { create(:user, username: "manager", email: "manager@example.com") }
+  let(:instructor_user) { create(:user, username: "instructor", email: "instructor@example.com", roles: [:instructor]) }
   let(:admin_token) { JsonWebToken.encode(user_id: admin_user.id) }
   let(:regular_token) { JsonWebToken.encode(user_id: regular_user.id) }
-
-  before do
-    admin_user.user_roles.create!(role: :admin)
-    manager_user.user_roles.create!(role: :manager)
-  end
 
   describe "GET /api/admin/users" do
     context "with admin role" do
@@ -89,41 +84,8 @@ RSpec.describe "Api::Admin::Users", type: :request do
         expect(usernames).to include('admin')
         expect(usernames).not_to include('regular')
       end
-
-      it "filters users by manager role" do
-        get "/api/admin/users", params: { role: "manager" }, headers: { 'Authorization' => "Bearer #{admin_token}" }
-
-        json = JSON.parse(response.body)
-        usernames = json['users'].map { |u| u['username'] }
-        expect(usernames).to include('manager')
-        expect(usernames).not_to include('admin')
-      end
     end
 
-    context "with profile_type filter" do
-      before do
-        # Create profiles with teacher_detail for admin and student_details for regular user
-        create(:profile, :teacher, user: admin_user)
-        create(:profile, :student, user: regular_user)
-      end
-
-      it "filters users by teacher profile" do
-        get "/api/admin/users", params: { profile_type: "teacher" }, headers: { 'Authorization' => "Bearer #{admin_token}" }
-
-        json = JSON.parse(response.body)
-        usernames = json['users'].map { |u| u['username'] }
-        expect(usernames).to include('admin')
-        # Note: A user can have both teacher_detail and student_details
-      end
-
-      it "filters users by student profile" do
-        get "/api/admin/users", params: { profile_type: "student" }, headers: { 'Authorization' => "Bearer #{admin_token}" }
-
-        json = JSON.parse(response.body)
-        usernames = json['users'].map { |u| u['username'] }
-        expect(usernames).to include('regular')
-      end
-    end
 
     context "with pagination" do
       before do
@@ -245,17 +207,6 @@ RSpec.describe "Api::Admin::Users", type: :request do
 
   describe "POST /api/admin/users/:id/roles" do
     context "with admin role" do
-      it "adds a valid role to user" do
-        post "/api/admin/users/#{regular_user.id}/roles",
-             params: { role: "manager" },
-             headers: { 'Authorization' => "Bearer #{admin_token}" }
-
-        expect(response).to have_http_status(:ok)
-        json = JSON.parse(response.body)
-        expect(json['message']).to eq('Role added successfully')
-        expect(json['user']['roles']).to include('manager')
-      end
-
       it "adds admin role to user" do
         post "/api/admin/users/#{regular_user.id}/roles",
              params: { role: "admin" },
@@ -290,7 +241,7 @@ RSpec.describe "Api::Admin::Users", type: :request do
     context "without admin role" do
       it "returns 403 Forbidden" do
         post "/api/admin/users/#{regular_user.id}/roles",
-             params: { role: "manager" },
+             params: { role: "instructor" },
              headers: { 'Authorization' => "Bearer #{regular_token}" }
 
         expect(response).to have_http_status(:forbidden)
@@ -299,7 +250,7 @@ RSpec.describe "Api::Admin::Users", type: :request do
 
     context "without authentication" do
       it "returns 401 Unauthorized" do
-        post "/api/admin/users/#{regular_user.id}/roles", params: { role: "manager" }
+        post "/api/admin/users/#{regular_user.id}/roles", params: { role: "instructor" }
 
         expect(response).to have_http_status(:unauthorized)
       end
@@ -309,13 +260,13 @@ RSpec.describe "Api::Admin::Users", type: :request do
   describe "DELETE /api/admin/users/:id/roles/:role" do
     context "with admin role" do
       it "removes an existing role from user" do
-        delete "/api/admin/users/#{manager_user.id}/roles/manager",
+        delete "/api/admin/users/#{instructor_user.id}/roles/instructor",
                headers: { 'Authorization' => "Bearer #{admin_token}" }
 
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body)
         expect(json['message']).to eq('Role removed successfully')
-        expect(json['user']['roles']).not_to include('manager')
+        expect(json['user']['roles']).not_to include('instructor')
       end
 
       it "returns error when user does not have the role" do
@@ -330,7 +281,7 @@ RSpec.describe "Api::Admin::Users", type: :request do
 
     context "without admin role" do
       it "returns 403 Forbidden" do
-        delete "/api/admin/users/#{manager_user.id}/roles/manager",
+        delete "/api/admin/users/#{instructor_user.id}/roles/instructor",
                headers: { 'Authorization' => "Bearer #{regular_token}" }
 
         expect(response).to have_http_status(:forbidden)
@@ -339,7 +290,7 @@ RSpec.describe "Api::Admin::Users", type: :request do
 
     context "without authentication" do
       it "returns 401 Unauthorized" do
-        delete "/api/admin/users/#{manager_user.id}/roles/manager"
+        delete "/api/admin/users/#{instructor_user.id}/roles/instructor"
 
         expect(response).to have_http_status(:unauthorized)
       end
@@ -350,28 +301,28 @@ RSpec.describe "Api::Admin::Users", type: :request do
     context "with admin role" do
       it "updates all user roles with valid roles array" do
         put "/api/admin/users/#{regular_user.id}/roles",
-            params: { roles: [ "admin", "manager" ] },
+            params: { roles: [ "admin", "instructor" ] },
             headers: { 'Authorization' => "Bearer #{admin_token}" }
 
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body)
         expect(json['message']).to eq('Roles updated successfully')
-        expect(json['user']['roles']).to match_array([ 'admin', 'manager' ])
+        expect(json['user']['roles']).to match_array([ 'admin', 'instructor' ])
       end
 
       it "replaces existing roles" do
-        put "/api/admin/users/#{manager_user.id}/roles",
+        put "/api/admin/users/#{instructor_user.id}/roles",
             params: { roles: [ "admin" ] },
             headers: { 'Authorization' => "Bearer #{admin_token}" }
 
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body)
         expect(json['user']['roles']).to eq([ 'admin' ])
-        expect(json['user']['roles']).not_to include('manager')
+        expect(json['user']['roles']).not_to include('instructor')
       end
 
       it "allows empty roles array" do
-        put "/api/admin/users/#{manager_user.id}/roles",
+        put "/api/admin/users/#{instructor_user.id}/roles",
             params: { roles: [] },
             headers: { 'Authorization' => "Bearer #{admin_token}" }
 

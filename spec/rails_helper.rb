@@ -41,6 +41,13 @@ RSpec.configure do |config|
   ]
   # to allow all methods of faker in specs
   config.include FactoryBot::Syntax::Methods
+  # Include ActiveSupport time helpers for travel_to/travel_back
+  config.include ActiveSupport::Testing::TimeHelpers
+
+  # Enable PaperTrail for tests
+  config.before(:each) do
+    PaperTrail.enabled = true
+  end
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false

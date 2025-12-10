@@ -11,7 +11,7 @@ class User < ApplicationRecord
   validates :password, presence: true, length: { minimum: 8 },
             format: {
               with: /\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+\z/,
-              message: "must include at least one lowercase letter, one uppercase letter, and one digit" }
+              message: "must include at least one lowercase letter, one uppercase letter, and one digit" }, on: :create
   validate :email_or_mobile_present
   validate :roles_are_valid
 
@@ -68,6 +68,7 @@ class User < ApplicationRecord
 
   private
   def encrypt_password
+    return if password.blank?
     self.encrypted_password = BCrypt::Password.create(self.password)
   end
 

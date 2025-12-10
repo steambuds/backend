@@ -28,7 +28,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_100712) do
     t.index ["user_id"], name: "index_attendances_on_user_id"
   end
 
-  create_table "group_users", primary_key: ["group_id", "user_id"], force: :cascade do |t|
+  create_table "group_users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.uuid "created_by"
     t.uuid "group_id", null: false
@@ -94,7 +94,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_100712) do
     t.index ["user_id"], name: "index_refresh_tokens_on_user_id"
   end
 
-  create_table "school_users", primary_key: ["school_id", "user_id"], force: :cascade do |t|
+  create_table "school_users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.uuid "created_by"
     t.string "relation", null: false
@@ -141,6 +141,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_100712) do
     t.bigint "item_id", null: false
     t.string "item_type", null: false
     t.text "object"
+    t.text "object_changes"
     t.string "whodunnit"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end

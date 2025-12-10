@@ -3,14 +3,10 @@ require 'rails_helper'
 RSpec.describe "Api::Profiles", type: :request do
   let(:user) { create(:user) }
   let(:other_user) { create(:user, username: "otheruser", email: "other@example.com") }
-  let(:admin_user) { create(:user, username: "admin", email: "admin@example.com") }
+  let(:admin_user) { create(:user, :admin, username: "admin", email: "admin@example.com") }
   let(:token) { JsonWebToken.encode(user_id: user.id) }
   let(:other_token) { JsonWebToken.encode(user_id: other_user.id) }
   let(:admin_token) { JsonWebToken.encode(user_id: admin_user.id) }
-
-  before do
-    admin_user.user_roles.create!(role: :admin)
-  end
 
   describe "GET /api/profiles" do
     context "with admin role" do

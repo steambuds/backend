@@ -1,13 +1,13 @@
 class GroupUser < ApplicationRecord
   has_paper_trail
 
-  self.primary_key = [:group_id, :user_id]
   belongs_to :group
   belongs_to :user
 
   validates :relation, presence: true
   validate :relation_is_valid_role
   validate :user_has_required_role
+  validates :user_id, uniqueness: { scope: :group_id, message: "is already a member of this group" }
 
   # Convert relation to symbol for consistent usage
   def relation
