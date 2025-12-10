@@ -40,7 +40,12 @@ This project follows a **task-based approach** for all development work:
 4. **Completing Tasks:** When task is finished:
    - Set status to `completed`
    - Document all contextual changes made
-   - Update AGENT.md with any new information discovered
+   - **Update AGENT.md with new information in compact manner:**
+     - Add/update relevant sections with new features, models, or architectural changes
+     - Keep descriptions concise (2-3 sentences per component)
+     - Update database schema section if schema changed
+     - Update API routes if new endpoints added
+     - Remove outdated information that was replaced
    - Add completion date
 
 ### Task Statuses
@@ -140,10 +145,10 @@ The application implements a complete JWT-based authentication system with refre
 - `has_role?(role_name)` method to check if user has a specific role
 
 **UserRole Model** (app/models/user_role.rb)
-- Join table for User and roles
+- Join table for User and roles using composite PK on (user_id, role)
 - Enum role: [:admin, :server_machine, :manager]
 - Each user can have multiple roles
-- UUID primary keys
+- No separate id column, uses composite primary key
 
 **RefreshToken Model** (app/models/refresh_token.rb)
 - Generates secure random hex token on creation
@@ -174,10 +179,26 @@ The application implements a complete JWT-based authentication system with refre
 - Auto-destroys expired refresh tokens
 
 ### Database Schema
-- **Users table:** uuid id, username, email, encrypted_password, remember_created_at
-- **UserRoles table:** uuid id, user_id (uuid foreign key), role (string enum: admin/server_machine/manager)
-  - Unique constraint on [user_id, role] combination to prevent duplicate role assignments
-- **RefreshTokens table:** uuid id, user_id (uuid foreign key), token, expires_at
+
+The database uses UUID primary keys and follows an audit trail pattern with `created_by` and `updated_by` fields on most tables (except hellos). Complete schema documented in `database.canvas`.
+
+**Core Tables:**
+- **users:** uuid id (PK), username, email (unique indexed), encrypted_password, mobile_number (indexed), created_by, updated_by
+- **profiles:** Composite PK where id = users.id, contains JSONB fields (teacher_detail, student_details, experience), steamer_id (unique), name, bio, avatar_url, father_name, mother_name, gender, alternate_mobile_number
+- **user_roles:** Composite PK on (user_id, role), no separate id column
+- **refresh_tokens:** uuid id, user_id FK, token (indexed), expires_at
+
+**School Management:**
+- **schools:** uuid id, steamer_id (unique), school_name, district, city_village, pincode, landmark, address
+- **school_users:** Composite PK on (school_id, user_id), relation enum (instructor/facilitator/student/principal)
+
+**Group & Attendance:**
+- **groups:** uuid id, name, about, grades, same_school boolean
+- **group_users:** Composite PK on (group_id, user_id), relation enum (student/instructor/facilitator)
+- **attendances:** uuid id, group_id, user_id, attendance_at (all indexed)
+
+**Contact Form:**
+- **hellos:** uuid id, name, email, mobile_number, description, category (intentionally no audit fields)
 
 ### Protecting Endpoints with Authentication
 
@@ -302,12 +323,14 @@ end
 ## User Profiles
 
 **Profile Model** (app/models/profile.rb)
-- One-to-one with User (`has_one :profile, dependent: :destroy`)
-- Enum user_type: [:teacher, :student] with conditional validations
-- Common fields: bio, avatar_url, phone, address, date_of_birth
-- Teacher fields: subjects_taught (required), years_experience, qualification
-- Student fields: grade_level (required), enrollment_date (required), parent_contact
-- UUID primary keys, unique user_id constraint
+- One-to-one with User using composite PK where `profiles.id = users.id`
+- User type determined by user_roles (teacher/student roles), not stored in profile
+- Common fields: name, bio, avatar_url, gender, address, date_of_birth, father_name, mother_name, alternate_mobile_number
+- JSONB fields for flexible data:
+  - `teacher_detail`: {years_of_experience, qualification, subjects: []}
+  - `student_details`: {grade, section, roll_number, enrollment_date}
+  - `experience`: [{type, description, duration, organization}]
+- Unique `steamer_id` for external system integration
 
 **Authorization Pattern** (app/controllers/api/profiles_controller.rb)
 - All endpoints require JWT authentication
