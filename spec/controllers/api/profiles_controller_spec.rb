@@ -112,10 +112,12 @@ RSpec.describe "Api::Profiles", type: :request do
           name: "John Teacher",
           bio: "Experienced teacher",
           gender: "male",
-          teacher_detail: {
-            subjects_taught: "Mathematics, Physics",
-            years_experience: 10,
-            qualification: "PhD in Mathematics"
+          roll_specific_detail: {
+            teacher: {
+              subjects: [ "Mathematics", "Physics" ],
+              years_of_experience: 10,
+              qualification: "PhD in Mathematics"
+            }
           },
           alternate_mobile_number: "+1234567890",
           date_of_birth: "1985-05-15"
@@ -130,7 +132,7 @@ RSpec.describe "Api::Profiles", type: :request do
         expect(response).to have_http_status(:created)
         json = JSON.parse(response.body)
         expect(json['name']).to eq('John Teacher')
-        expect(json['teacher_detail']['subjects_taught']).to eq('Mathematics, Physics')
+        expect(json['roll_specific_detail']['teacher']['subjects']).to include('Mathematics')
         expect(json['id']).to eq(user.id)
       end
     end
@@ -141,10 +143,13 @@ RSpec.describe "Api::Profiles", type: :request do
           name: "Jane Student",
           bio: "High school student",
           gender: "female",
-          student_details: {
-            grade_level: "Grade 10",
-            enrollment_date: "2023-09-01",
-            parent_contact: "+9876543210"
+          roll_specific_detail: {
+            student: {
+              grade: "10",
+              section: "A",
+              roll_number: "10A001",
+              enrollment_date: "2023-09-01"
+            }
           },
           alternate_mobile_number: "+1234567890"
         }
@@ -158,7 +163,7 @@ RSpec.describe "Api::Profiles", type: :request do
         expect(response).to have_http_status(:created)
         json = JSON.parse(response.body)
         expect(json['name']).to eq('Jane Student')
-        expect(json['student_details']['grade_level']).to eq('Grade 10')
+        expect(json['roll_specific_detail']['student']['grade']).to eq('10')
         expect(json['id']).to eq(user.id)
       end
     end
@@ -245,15 +250,15 @@ RSpec.describe "Api::Profiles", type: :request do
         expect(json['name']).to eq('Updated Name')
       end
 
-      it "updates teacher_detail JSONB field" do
+      it "updates roll_specific_detail JSONB field" do
         patch "/api/profiles/#{profile.id}",
-              params: { teacher_detail: { subjects_taught: "Computer Science", years_experience: "5" } },
+              params: { roll_specific_detail: { teacher: { subjects: [ "Computer Science" ], years_of_experience: 5 } } },
               headers: { 'Authorization' => "Bearer #{token}" }
 
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body)
-        expect(json['teacher_detail']['subjects_taught']).to eq('Computer Science')
-        expect(json['teacher_detail']['years_experience']).to eq("5")
+        expect(json['roll_specific_detail']['teacher']['subjects']).to include('Computer Science')
+        expect(json['roll_specific_detail']['teacher']['years_of_experience']).to eq("5")
       end
 
       it "updates only specified fields" do

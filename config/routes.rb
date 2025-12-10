@@ -17,14 +17,12 @@ Rails.application.routes.draw do
       resources :attendances, only: [ :index, :create ]
     end
 
-    # Admin routes
-    namespace :admin do
-      resources :users, only: [ :index, :show ] do
-        member do
-          post "roles", to: "users#add_role"
-          delete "roles/:role", to: "users#remove_role", as: "remove_role"
-          put "roles", to: "users#update_roles"
-        end
+    # User management routes
+    resources :users, only: [ :index, :show ] do
+      member do
+        post "roles", to: "users#add_role"
+        delete "roles/:role", to: "users#remove_role", as: "remove_role"
+        put "roles", to: "users#update_roles"
       end
     end
   end

@@ -12,7 +12,7 @@ Creates a new user account.
 ```bash
 curl -X POST -H "Content-Type: application/json" -d '{
   "username": "testuser",
-  "email": "test@example.com",
+  "email": "test@example2.com",
   "password": "Password123"
 }' http://localhost:8000/api/user
 ```
@@ -22,7 +22,7 @@ curl -X POST -H "Content-Type: application/json" -d '{
 {
   "id": "uuid",
   "username": "testuser",
-  "email": "test@example.com"
+  "email": "test@example2.com"
 }
 ```
 
@@ -38,7 +38,7 @@ Logs in a user and returns a JWT access token and a refresh token.
 ```bash
 curl -X POST -H "Content-Type: application/json" -d '{
   "email": "ghanshyam@steambuds.com",
-  "password": "Admin123"
+  "password": "Password123"
 }' http://localhost:8000/api/login
 ```
 
@@ -221,19 +221,25 @@ curl -H "Authorization: Bearer your_access_token" \
 [
   {
     "id": "uuid",
-    "user_id": "uuid",
-    "user_type": "student",
+    "name": "Arjun Kumar",
+    "steamer_id": 9000001,
+    "father_name": "Rajesh Kumar",
+    "mother_name": "Priya Kumar",
+    "gender": "male",
     "bio": "A passionate student.",
     "avatar_url": "http://example.com/avatar.jpg",
-    "phone": "+1234567890",
+    "alternate_mobile_number": "+1234567890",
     "address": "123 Main St",
     "date_of_birth": "2000-01-01",
-    "subjects_taught": null,
-    "years_experience": null,
-    "qualification": null,
-    "grade_level": "10",
-    "enrollment_date": "2023-09-01",
-    "parent_contact": "parent@example.com",
+    "roll_specific_detail": {
+      "student": {
+        "grade": "10",
+        "section": "A",
+        "roll_number": "10A001",
+        "enrollment_date": "2023-09-01"
+      }
+    },
+    "experience": [],
     "created_at": "2025-11-01T10:00:00.000Z",
     "updated_at": "2025-11-01T10:00:00.000Z"
   }
@@ -258,21 +264,27 @@ curl -H "Authorization: Bearer your_access_token" \
 ```json
 {
   "id": "uuid",
-  "user_id": "uuid",
-  "user_type": "student",
+  "name": "Arjun Kumar",
+  "steamer_id": 9000001,
+  "father_name": "Rajesh Kumar",
+  "mother_name": "Priya Kumar",
+  "gender": "male",
   "bio": "A passionate student.",
   "avatar_url": "http://example.com/avatar.jpg",
-  "phone": "+1234567890",
+  "alternate_mobile_number": "+1234567890",
   "address": "123 Main St",
   "date_of_birth": "2000-01-01",
-    "subjects_taught": null,
-    "years_experience": null,
-    "qualification": null,
-    "grade_level": "10",
-    "enrollment_date": "2023-09-01",
-    "parent_contact": "parent@example.com",
-    "created_at": "2025-11-01T10:00:00.000Z",
-    "updated_at": "2025-11-01T10:00:00.000Z"
+  "roll_specific_detail": {
+    "student": {
+      "grade": "10",
+      "section": "A",
+      "roll_number": "10A001",
+      "enrollment_date": "2023-09-01"
+    }
+  },
+  "experience": [],
+  "created_at": "2025-11-01T10:00:00.000Z",
+  "updated_at": "2025-11-01T10:00:00.000Z"
 }
 ```
 
@@ -284,18 +296,59 @@ Creates a new user profile. **Requires JWT authentication. Each user can only ha
 
 **Endpoint:** `POST /api/profiles`
 
-**Request:**
+**Request (Student Example):**
 ```bash
 curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer your_access_token" -d '{
-  "user_type": "student",
+  "name": "Arjun Kumar",
+  "steamer_id": 9000001,
+  "father_name": "Rajesh Kumar",
+  "mother_name": "Priya Kumar",
+  "gender": "male",
   "bio": "A passionate student.",
   "avatar_url": "http://example.com/avatar.jpg",
-  "phone": "+1234567890",
+  "alternate_mobile_number": "+1234567890",
   "address": "123 Main St",
   "date_of_birth": "2000-01-01",
-  "grade_level": "10",
-  "enrollment_date": "2023-09-01",
-  "parent_contact": "parent@example.com"
+  "roll_specific_detail": {
+    "student": {
+      "grade": "10",
+      "section": "A",
+      "roll_number": "10A001",
+      "enrollment_date": "2023-09-01"
+    }
+  },
+  "experience": []
+}' http://localhost:8000/api/profiles
+```
+
+**Request (Teacher Example):**
+```bash
+curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer your_access_token" -d '{
+  "name": "Priya Sharma",
+  "steamer_id": 9000002,
+  "father_name": "Mohan Sharma",
+  "mother_name": "Lakshmi Sharma",
+  "gender": "female",
+  "bio": "Experienced mathematics teacher.",
+  "avatar_url": "http://example.com/avatar.jpg",
+  "alternate_mobile_number": "+1234567891",
+  "address": "456 Teacher Lane",
+  "date_of_birth": "1985-05-15",
+  "roll_specific_detail": {
+    "teacher": {
+      "years_of_experience": 10,
+      "qualification": "M.Sc. Mathematics",
+      "subjects": ["Mathematics", "Physics"]
+    }
+  },
+  "experience": [
+    {
+      "type": "teaching",
+      "description": "Mathematics teacher at ABC School",
+      "duration": "2015-2020",
+      "organization": "ABC School"
+    }
+  ]
 }' http://localhost:8000/api/profiles
 ```
 
@@ -303,19 +356,25 @@ curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer your_
 ```json
 {
   "id": "uuid",
-  "user_id": "uuid",
-  "user_type": "student",
+  "name": "Arjun Kumar",
+  "steamer_id": 9000001,
+  "father_name": "Rajesh Kumar",
+  "mother_name": "Priya Kumar",
+  "gender": "male",
   "bio": "A passionate student.",
   "avatar_url": "http://example.com/avatar.jpg",
-  "phone": "+1234567890",
+  "alternate_mobile_number": "+1234567890",
   "address": "123 Main St",
   "date_of_birth": "2000-01-01",
-  "subjects_taught": null,
-  "years_experience": null,
-  "qualification": null,
-  "grade_level": "10",
-  "enrollment_date": "2023-09-01",
-  "parent_contact": "parent@example.com",
+  "roll_specific_detail": {
+    "student": {
+      "grade": "10",
+      "section": "A",
+      "roll_number": "10A001",
+      "enrollment_date": "2023-09-01"
+    }
+  },
+  "experience": [],
   "created_at": "2025-11-01T10:00:00.000Z",
   "updated_at": "2025-11-01T10:00:00.000Z"
 }
@@ -332,7 +391,8 @@ Updates an existing user profile. **Requires JWT authentication. Users can only 
 **Request:**
 ```bash
 curl -X PUT -H "Content-Type: application/json" -H "Authorization: Bearer your_access_token" -d '{
-  "bio": "An updated bio for the student."
+  "bio": "An updated bio for the student.",
+  "address": "456 New Address"
 }' http://localhost:8000/api/profiles/uuid-here
 ```
 
@@ -340,21 +400,27 @@ curl -X PUT -H "Content-Type: application/json" -H "Authorization: Bearer your_a
 ```json
 {
   "id": "uuid",
-  "user_id": "uuid",
-  "user_type": "student",
+  "name": "Arjun Kumar",
+  "steamer_id": 9000001,
+  "father_name": "Rajesh Kumar",
+  "mother_name": "Priya Kumar",
+  "gender": "male",
   "bio": "An updated bio for the student.",
   "avatar_url": "http://example.com/avatar.jpg",
-  "phone": "+1234567890",
-  "address": "123 Main St",
+  "alternate_mobile_number": "+1234567890",
+  "address": "456 New Address",
   "date_of_birth": "2000-01-01",
-  "subjects_taught": null,
-  "years_experience": null,
-  "qualification": null,
-  "grade_level": "10",
-  "enrollment_date": "2023-09-01",
-  "parent_contact": "parent@example.com",
+  "roll_specific_detail": {
+    "student": {
+      "grade": "10",
+      "section": "A",
+      "roll_number": "10A001",
+      "enrollment_date": "2023-09-01"
+    }
+  },
+  "experience": [],
   "created_at": "2025-11-01T10:00:00.000Z",
-  "updated_at": "2025-11-01T10:00:00.000Z"
+  "updated_at": "2025-11-01T10:30:00.000Z"
 }
 ```
 
@@ -404,17 +470,17 @@ curl -X DELETE -H "Authorization: Bearer your_access_token" \
 
 ---
 
-## Admin Routes
+## User Management Routes
 
 ### List All Users
 
 Retrieves a paginated list of all users with their profiles and roles. Supports search and filtering. **Requires JWT authentication and admin role.**
 
-**Endpoint:** `GET /api/admin/users`
+**Endpoint:** `GET /api/users`
 
 **Query Parameters:**
 - `search` (optional): Fuzzy search on email and phone number
-- `role` (optional): Filter by user role (admin, manager, server_machine)
+- `role` (optional): Filter by user role (admin, system_user, instructor, facilitator, student)
 - `profile_type` (optional): Filter by profile type (teacher, student)
 - `page` (optional): Page number (default: 1)
 - `per_page` (optional): Records per page (default: 20, max: 100)
@@ -423,23 +489,23 @@ Retrieves a paginated list of all users with their profiles and roles. Supports 
 ```bash
 # Get all users with pagination
 curl -X GET -H "Authorization: Bearer your_access_token" \
-  http://localhost:8000/api/admin/users?page=1&per_page=20
+  http://localhost:8000/api/users?page=1&per_page=20
 
 # Search users by email or phone
 curl -X GET -H "Authorization: Bearer your_access_token" \
-  http://localhost:8000/api/admin/users?search=john@example.com
+  http://localhost:8000/api/users?search=john@example.com
 
 # Filter by role
 curl -X GET -H "Authorization: Bearer your_access_token" \
-  http://localhost:8000/api/admin/users?role=admin
+  http://localhost:8000/api/users?role=admin
 
 # Filter by profile type
 curl -X GET -H "Authorization: Bearer your_access_token" \
-  http://localhost:8000/api/admin/users?profile_type=teacher
+  http://localhost:8000/api/users?profile_type=teacher
 
 # Combined filters and search
 curl -X GET -H "Authorization: Bearer your_access_token" \
-  "http://localhost:8000/api/admin/users?search=john&role=manager&page=1&per_page=10"
+  "http://localhost:8000/api/users?search=john&role=manager&page=1&per_page=10"
 ```
 
 **Response:**
@@ -452,9 +518,9 @@ curl -X GET -H "Authorization: Bearer your_access_token" \
       "email": "john@example.com",
       "mobile_number": "+1234567890",
       "created_at": "2024-01-15T10:30:00Z",
-      "roles": ["admin", "manager"],
+      "roles": ["admin", "instructor"],
       "profile": {
-        "user_type": "teacher",
+        "name": "John Doe",
         "bio": "Experienced mathematics teacher"
       }
     }
@@ -474,12 +540,12 @@ curl -X GET -H "Authorization: Bearer your_access_token" \
 
 Retrieves detailed information about a specific user including full profile and roles. **Requires JWT authentication and admin role.**
 
-**Endpoint:** `GET /api/admin/users/:id`
+**Endpoint:** `GET /api/users/:id`
 
 **Request:**
 ```bash
 curl -X GET -H "Authorization: Bearer your_access_token" \
-  http://localhost:8000/api/admin/users/user_uuid
+  http://localhost:8000/api/users/user_uuid
 ```
 
 **Response:**
@@ -494,15 +560,24 @@ curl -X GET -H "Authorization: Bearer your_access_token" \
   "roles": ["admin"],
   "profile": {
     "id": "profile_uuid",
-    "user_type": "teacher",
+    "name": "John Doe",
+    "steamer_id": 9000001,
+    "father_name": "Robert Doe",
+    "mother_name": "Jane Doe",
+    "gender": "male",
     "bio": "Experienced mathematics teacher",
     "avatar_url": "https://example.com/avatar.jpg",
-    "phone": "+1234567890",
+    "alternate_mobile_number": "+1234567890",
     "address": "123 Main St, City, Country",
     "date_of_birth": "1985-05-15",
-    "subjects_taught": "Mathematics, Physics",
-    "years_experience": 10,
-    "qualification": "PhD in Mathematics"
+    "roll_specific_detail": {
+      "teacher": {
+        "years_of_experience": 10,
+        "qualification": "PhD in Mathematics",
+        "subjects": ["Mathematics", "Physics"]
+      }
+    },
+    "experience": []
   }
 }
 ```
@@ -520,14 +595,14 @@ curl -X GET -H "Authorization: Bearer your_access_token" \
 
 Adds a specific role to a user. **Requires JWT authentication and admin role.**
 
-**Endpoint:** `POST /api/admin/users/:id/roles`
+**Endpoint:** `POST /api/users/:id/roles`
 
 **Request:**
 ```bash
 curl -X POST -H "Content-Type: application/json" \
   -H "Authorization: Bearer your_access_token" \
   -d '{"role": "manager"}' \
-  http://localhost:8000/api/admin/users/user_uuid/roles
+  http://localhost:8000/api/users/user_uuid/roles
 ```
 
 **Response:**
@@ -545,7 +620,7 @@ curl -X POST -H "Content-Type: application/json" \
 **Error Response (Invalid Role):**
 ```json
 {
-  "error": "Invalid role. Valid roles are: admin, server_machine, manager"
+  "error": "Invalid role. Valid roles are: admin, system_user, instructor, facilitator, student"
 }
 ```
 
@@ -562,12 +637,12 @@ curl -X POST -H "Content-Type: application/json" \
 
 Removes a specific role from a user. **Requires JWT authentication and admin role.**
 
-**Endpoint:** `DELETE /api/admin/users/:id/roles/:role`
+**Endpoint:** `DELETE /api/users/:id/roles/:role`
 
 **Request:**
 ```bash
 curl -X DELETE -H "Authorization: Bearer your_access_token" \
-  http://localhost:8000/api/admin/users/user_uuid/roles/manager
+  http://localhost:8000/api/users/user_uuid/roles/manager
 ```
 
 **Response:**
@@ -595,7 +670,7 @@ curl -X DELETE -H "Authorization: Bearer your_access_token" \
 
 Replaces all user roles with a new set of roles. **Requires JWT authentication and admin role.**
 
-**Endpoint:** `PUT /api/admin/users/:id/roles`
+**Endpoint:** `PUT /api/users/:id/roles`
 
 **Request:**
 ```bash
@@ -603,13 +678,13 @@ Replaces all user roles with a new set of roles. **Requires JWT authentication a
 curl -X PUT -H "Content-Type: application/json" \
   -H "Authorization: Bearer your_access_token" \
   -d '{"roles": ["admin", "manager"]}' \
-  http://localhost:8000/api/admin/users/user_uuid/roles
+  http://localhost:8000/api/users/user_uuid/roles
 
 # Remove all roles (empty array)
 curl -X PUT -H "Content-Type: application/json" \
   -H "Authorization: Bearer your_access_token" \
   -d '{"roles": []}' \
-  http://localhost:8000/api/admin/users/user_uuid/roles
+  http://localhost:8000/api/users/user_uuid/roles
 ```
 
 **Response:**
@@ -628,7 +703,7 @@ curl -X PUT -H "Content-Type: application/json" \
 ```json
 {
   "error": "Invalid roles: invalid_role, another_invalid",
-  "valid_roles": ["admin", "server_machine", "manager"]
+  "valid_roles": ["admin", "system_user", "instructor", "facilitator", "student"]
 }
 ```
 
@@ -877,8 +952,10 @@ curl -X POST -H "Content-Type: application/json" \
 
 ### Available Roles
 - **admin** - Administrator role with full access to all protected endpoints
-- **manager** - Manager role with elevated permissions
-- **server_machine** - Server/machine role for automated processes
+- **system_user** - System/automated process role
+- **instructor** - Teacher role for leading groups and marking attendance
+- **facilitator** - Community facilitator role for supporting groups
+- **student** - Student role for group membership and attendance tracking
 
 ### Endpoint Access Summary
 
@@ -896,11 +973,11 @@ curl -X POST -H "Content-Type: application/json" \
 | POST /api/profiles | Yes | None (User can only create one profile) |
 | PUT/PATCH /api/profiles/:id | Yes | Own Profile or admin |
 | DELETE /api/profiles/:id | Yes | Own Profile or admin |
-| GET /api/admin/users | Yes | admin |
-| GET /api/admin/users/:id | Yes | admin |
-| POST /api/admin/users/:id/roles | Yes | admin |
-| DELETE /api/admin/users/:id/roles/:role | Yes | admin |
-| PUT /api/admin/users/:id/roles | Yes | admin |
+| GET /api/users | Yes | admin |
+| GET /api/users/:id | Yes | admin |
+| POST /api/users/:id/roles | Yes | admin |
+| DELETE /api/users/:id/roles/:role | Yes | admin |
+| PUT /api/users/:id/roles | Yes | admin |
 | GET /api/groups | Yes | None (Instructor/Facilitator) |
 | GET /api/groups/:group_id/attendances | Yes | None (Instructor/Facilitator of group) |
 | POST /api/groups/:group_id/attendances | Yes | None (Instructor/Facilitator of group) |

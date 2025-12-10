@@ -406,8 +406,9 @@ end
 - User type determined by user_roles (teacher/student roles), not stored in profile
 - Common fields: name, bio, avatar_url, gender, address, date_of_birth, father_name, mother_name, alternate_mobile_number
 - JSONB fields for flexible data:
-  - `teacher_detail`: {years_of_experience, qualification, subjects: []}
-  - `student_details`: {grade, section, roll_number, enrollment_date}
+  - `roll_specific_detail`: Stores both teacher and student data
+    - teacher: {years_of_experience, qualification, subjects: []}
+    - student: {grade, section, roll_number, enrollment_date}
   - `experience`: [{type, description, duration, organization}]
 - Unique `steamer_id` for external system integration
 
@@ -438,20 +439,20 @@ PUT    /api/profiles/:id  # Update (own or admin)
 DELETE /api/profiles/:id  # Delete (own or admin)
 ```
 
-### Admin Endpoints (Protected - Admin Role Required)
+### User Management Endpoints (Protected - Admin Role Required)
 ```ruby
-GET    /api/admin/users                    # List users (pagination, search, filters)
-GET    /api/admin/users/:id                # Get user details with profile & roles
-POST   /api/admin/users/:id/roles          # Add role to user
-DELETE /api/admin/users/:id/roles/:role    # Remove role from user
-PUT    /api/admin/users/:id/roles          # Update all user roles
+GET    /api/users                    # List users (pagination, search, filters)
+GET    /api/users/:id                # Get user details with profile & roles
+POST   /api/users/:id/roles          # Add role to user
+DELETE /api/users/:id/roles/:role    # Remove role from user
+PUT    /api/users/:id/roles          # Update all user roles
 ```
 
 **Features:**
 - **Pagination:** Default 20/page, max 100 (params: `page`, `per_page`)
 - **Search:** Fuzzy match on email/phone (param: `search`)
 - **Filters:** By role or profile_type (params: `role`, `profile_type`)
-- **Controller:** `Api::Admin::UsersController` (app/controllers/api/admin/users_controller.rb)
+- **Controller:** `Api::UsersController` (app/controllers/api/users_controller.rb)
 
 ### Protected Endpoints with Authorization (Require JWT + Role)
 ```ruby

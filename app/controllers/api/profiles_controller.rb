@@ -73,8 +73,7 @@ module Api
         :alternate_mobile_number,
         :address,
         :date_of_birth,
-        teacher_detail: {},
-        student_details: {},
+        roll_specific_detail: {},
         experience: {}
       )
     end

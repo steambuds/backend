@@ -101,14 +101,9 @@ RSpec.describe Profile, type: :model do
   describe "JSONB fields" do
     let(:user) { create(:user) }
 
-    it "initializes teacher_detail as empty hash by default" do
+    it "initializes roll_specific_detail as empty hash by default" do
       profile = Profile.new(id: user.id)
-      expect(profile.teacher_detail).to eq({})
-    end
-
-    it "initializes student_details as empty hash by default" do
-      profile = Profile.new(id: user.id)
-      expect(profile.student_details).to eq({})
+      expect(profile.roll_specific_detail).to eq({})
     end
 
     it "initializes experience as empty hash by default" do
@@ -116,16 +111,18 @@ RSpec.describe Profile, type: :model do
       expect(profile.experience).to eq({})
     end
 
-    it "stores and retrieves teacher_detail hash" do
+    it "stores and retrieves teacher data in roll_specific_detail" do
       profile = create(:profile, :teacher, user: user)
-      expect(profile.teacher_detail).to be_a(Hash)
-      expect(profile.teacher_detail["subjects_taught"]).to be_present
+      expect(profile.roll_specific_detail).to be_a(Hash)
+      expect(profile.roll_specific_detail["teacher"]).to be_present
+      expect(profile.roll_specific_detail["teacher"]["subjects"]).to be_present
     end
 
-    it "stores and retrieves student_details hash" do
+    it "stores and retrieves student data in roll_specific_detail" do
       profile = create(:profile, :student, user: user)
-      expect(profile.student_details).to be_a(Hash)
-      expect(profile.student_details["grade_level"]).to be_present
+      expect(profile.roll_specific_detail).to be_a(Hash)
+      expect(profile.roll_specific_detail["student"]).to be_present
+      expect(profile.roll_specific_detail["student"]["grade"]).to be_present
     end
   end
 
