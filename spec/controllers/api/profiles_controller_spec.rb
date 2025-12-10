@@ -31,7 +31,7 @@ RSpec.describe "Api::Profiles", type: :request do
         get "/api/profiles", headers: { 'Authorization' => "Bearer #{admin_token}" }
 
         json = JSON.parse(response.body)
-        expect(json.first.keys).to include('id', 'user_id', 'user_type', 'bio', 'avatar_url')
+        expect(json.first.keys).to include('id', 'name', 'bio', 'avatar_url')
       end
     end
 
@@ -67,7 +67,6 @@ RSpec.describe "Api::Profiles", type: :request do
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body)
         expect(json['id']).to eq(profile.id)
-        expect(json['user_id']).to eq(user.id)
       end
     end
 
@@ -114,12 +113,15 @@ RSpec.describe "Api::Profiles", type: :request do
     context "with valid teacher params" do
       let(:valid_teacher_params) do
         {
-          user_type: "teacher",
+          name: "John Teacher",
           bio: "Experienced teacher",
-          subjects_taught: "Mathematics, Physics",
-          years_experience: 10,
-          qualification: "PhD in Mathematics",
-          phone: "+1234567890",
+          gender: "male",
+          teacher_detail: {
+            subjects_taught: "Mathematics, Physics",
+            years_experience: 10,
+            qualification: "PhD in Mathematics"
+          },
+          alternate_mobile_number: "+1234567890",
           date_of_birth: "1985-05-15"
         }
       end
@@ -131,21 +133,24 @@ RSpec.describe "Api::Profiles", type: :request do
 
         expect(response).to have_http_status(:created)
         json = JSON.parse(response.body)
-        expect(json['user_type']).to eq('teacher')
-        expect(json['subjects_taught']).to eq('Mathematics, Physics')
-        expect(json['user_id']).to eq(user.id)
+        expect(json['name']).to eq('John Teacher')
+        expect(json['teacher_detail']['subjects_taught']).to eq('Mathematics, Physics')
+        expect(json['id']).to eq(user.id)
       end
     end
 
     context "with valid student params" do
       let(:valid_student_params) do
         {
-          user_type: "student",
+          name: "Jane Student",
           bio: "High school student",
-          grade_level: "Grade 10",
-          enrollment_date: "2023-09-01",
-          parent_contact: "+9876543210",
-          phone: "+1234567890"
+          gender: "female",
+          student_details: {
+            grade_level: "Grade 10",
+            enrollment_date: "2023-09-01",
+            parent_contact: "+9876543210"
+          },
+          alternate_mobile_number: "+1234567890"
         }
       end
 
@@ -156,43 +161,42 @@ RSpec.describe "Api::Profiles", type: :request do
 
         expect(response).to have_http_status(:created)
         json = JSON.parse(response.body)
-        expect(json['user_type']).to eq('student')
-        expect(json['grade_level']).to eq('Grade 10')
-        expect(json['user_id']).to eq(user.id)
+        expect(json['name']).to eq('Jane Student')
+        expect(json['student_details']['grade_level']).to eq('Grade 10')
+        expect(json['id']).to eq(user.id)
+      end
+    end
+
+    context "with minimal params" do
+      let(:minimal_params) do
+        {
+          name: "Minimal User"
+        }
+      end
+
+      it "creates a profile with minimal data" do
+        expect {
+          post "/api/profiles", params: minimal_params, headers: { 'Authorization' => "Bearer #{token}" }
+        }.to change(Profile, :count).by(1)
+
+        expect(response).to have_http_status(:created)
+        json = JSON.parse(response.body)
+        expect(json['name']).to eq('Minimal User')
       end
     end
 
     context "with invalid params" do
-      it "returns errors when teacher is missing required fields" do
-        params = { user_type: "teacher", bio: "Test" }
+      it "returns error for invalid alternate_mobile_number format" do
+        params = { name: "Test", alternate_mobile_number: "invalid" }
         post "/api/profiles", params: params, headers: { 'Authorization' => "Bearer #{token}" }
 
         expect(response).to have_http_status(:unprocessable_content)
         json = JSON.parse(response.body)
-        expect(json['errors']).to include("Subjects taught can't be blank")
-      end
-
-      it "returns errors when student is missing required fields" do
-        params = { user_type: "student", bio: "Test" }
-        post "/api/profiles", params: params, headers: { 'Authorization' => "Bearer #{token}" }
-
-        expect(response).to have_http_status(:unprocessable_content)
-        json = JSON.parse(response.body)
-        expect(json['errors']).to include("Grade level can't be blank")
-        expect(json['errors']).to include("Enrollment date can't be blank")
-      end
-
-      it "returns error for invalid phone format" do
-        params = { user_type: "teacher", subjects_taught: "Math", phone: "invalid" }
-        post "/api/profiles", params: params, headers: { 'Authorization' => "Bearer #{token}" }
-
-        expect(response).to have_http_status(:unprocessable_content)
-        json = JSON.parse(response.body)
-        expect(json['errors']).to include("Phone must be a valid phone number (10-15 digits, optional +)")
+        expect(json['errors']).to include("Alternate mobile number must be a valid phone number (10-15 digits, optional +)")
       end
 
       it "returns error for future date_of_birth" do
-        params = { user_type: "teacher", subjects_taught: "Math", date_of_birth: Date.tomorrow }
+        params = { name: "Test", date_of_birth: Date.tomorrow }
         post "/api/profiles", params: params, headers: { 'Authorization' => "Bearer #{token}" }
 
         expect(response).to have_http_status(:unprocessable_content)
@@ -200,9 +204,18 @@ RSpec.describe "Api::Profiles", type: :request do
         expect(json['errors']).to include("Date of birth must be less than #{Date.current}")
       end
 
+      it "returns error for invalid gender" do
+        params = { name: "Test", gender: "invalid" }
+        post "/api/profiles", params: params, headers: { 'Authorization' => "Bearer #{token}" }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        json = JSON.parse(response.body)
+        expect(json['errors']).to include("Gender invalid is not a valid gender")
+      end
+
       it "returns error when user already has a profile" do
         create(:profile, :teacher, user: user)
-        params = { user_type: "student", grade_level: "Grade 5", enrollment_date: Date.today }
+        params = { name: "Duplicate" }
         post "/api/profiles", params: params, headers: { 'Authorization' => "Bearer #{token}" }
 
         expect(response).to have_http_status(:unprocessable_content)
@@ -213,7 +226,7 @@ RSpec.describe "Api::Profiles", type: :request do
 
     context "without authentication" do
       it "returns 401 Unauthorized" do
-        post "/api/profiles", params: { user_type: "teacher" }
+        post "/api/profiles", params: { name: "Test" }
 
         expect(response).to have_http_status(:unauthorized)
       end
@@ -227,17 +240,28 @@ RSpec.describe "Api::Profiles", type: :request do
     context "when user owns the profile" do
       it "updates the profile" do
         patch "/api/profiles/#{profile.id}",
-              params: { bio: "Updated bio", years_experience: 15 },
+              params: { bio: "Updated bio", name: "Updated Name" },
               headers: { 'Authorization' => "Bearer #{token}" }
 
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body)
         expect(json['bio']).to eq('Updated bio')
-        expect(json['years_experience']).to eq(15)
+        expect(json['name']).to eq('Updated Name')
+      end
+
+      it "updates teacher_detail JSONB field" do
+        patch "/api/profiles/#{profile.id}",
+              params: { teacher_detail: { subjects_taught: "Computer Science", years_experience: "5" } },
+              headers: { 'Authorization' => "Bearer #{token}" }
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body)
+        expect(json['teacher_detail']['subjects_taught']).to eq('Computer Science')
+        expect(json['teacher_detail']['years_experience']).to eq("5")
       end
 
       it "updates only specified fields" do
-        original_subjects = profile.subjects_taught
+        original_name = profile.name
         patch "/api/profiles/#{profile.id}",
               params: { bio: "New bio" },
               headers: { 'Authorization' => "Bearer #{token}" }
@@ -245,7 +269,7 @@ RSpec.describe "Api::Profiles", type: :request do
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body)
         expect(json['bio']).to eq('New bio')
-        expect(json['subjects_taught']).to eq(original_subjects)
+        expect(json['name']).to eq(original_name)
       end
     end
 
@@ -276,12 +300,12 @@ RSpec.describe "Api::Profiles", type: :request do
     context "with invalid update params" do
       it "returns errors for invalid data" do
         patch "/api/profiles/#{profile.id}",
-              params: { phone: "invalid" },
+              params: { alternate_mobile_number: "invalid" },
               headers: { 'Authorization' => "Bearer #{token}" }
 
         expect(response).to have_http_status(:unprocessable_content)
         json = JSON.parse(response.body)
-        expect(json['errors']).to include("Phone must be a valid phone number (10-15 digits, optional +)")
+        expect(json['errors']).to include("Alternate mobile number must be a valid phone number (10-15 digits, optional +)")
       end
     end
 

@@ -22,118 +22,125 @@ RSpec.describe Profile, type: :model do
         expect(profile).to be_valid
       end
 
-      it "requires user_type to be present" do
-        profile = build(:profile, user: user, user_type: nil)
-        expect(profile).not_to be_valid
-        expect(profile.errors[:user_type]).to include("can't be blank")
-      end
-
-      it "enforces unique user_id" do
-        create(:profile, :teacher, user: user)
-        duplicate_profile = build(:profile, :student, user: user)
-        expect(duplicate_profile).not_to be_valid
-        expect(duplicate_profile.errors[:user_id]).to include("has already been taken")
-      end
-    end
-
-    context "teacher-specific validations" do
-      it "requires subjects_taught for teachers" do
-        profile = build(:profile, user: user, user_type: "teacher", subjects_taught: nil)
-        expect(profile).not_to be_valid
-        expect(profile.errors[:subjects_taught]).to include("can't be blank")
-      end
-
-      it "validates years_experience is a positive integer" do
-        profile = build(:profile, :teacher, user: user, years_experience: -5)
-        expect(profile).not_to be_valid
-        expect(profile.errors[:years_experience]).to include("must be greater than or equal to 0")
-      end
-
-      it "allows nil years_experience for teachers" do
-        profile = build(:profile, :teacher, user: user, years_experience: nil)
+      it "is valid with minimal attributes" do
+        profile = build(:profile, user: user)
         expect(profile).to be_valid
       end
     end
 
-    context "student-specific validations" do
-      it "requires grade_level for students" do
-        profile = build(:profile, user: user, user_type: "student", grade_level: nil)
-        expect(profile).not_to be_valid
-        expect(profile.errors[:grade_level]).to include("can't be blank")
+    context "gender validation" do
+      it "allows valid gender values" do
+        %w[male female other].each do |gender|
+          profile = build(:profile, user: user, gender: gender)
+          expect(profile).to be_valid
+        end
       end
 
-      it "requires enrollment_date for students" do
-        profile = build(:profile, user: user, user_type: "student", enrollment_date: nil)
+      it "rejects invalid gender values" do
+        profile = build(:profile, user: user, gender: "invalid")
         expect(profile).not_to be_valid
-        expect(profile.errors[:enrollment_date]).to include("can't be blank")
+        expect(profile.errors[:gender]).to include("invalid is not a valid gender")
+      end
+
+      it "allows blank gender" do
+        profile = build(:profile, user: user, gender: nil)
+        expect(profile).to be_valid
+      end
+    end
+
+    context "steamer_id validation" do
+      it "enforces unique steamer_id" do
+        create(:profile, user: user, steamer_id: 12345)
+        user2 = create(:user, username: "user2", email: "user2@example.com")
+        duplicate_profile = build(:profile, user: user2, steamer_id: 12345)
+        expect(duplicate_profile).not_to be_valid
+        expect(duplicate_profile.errors[:steamer_id]).to include("has already been taken")
+      end
+
+      it "allows nil steamer_id" do
+        profile = build(:profile, user: user, steamer_id: nil)
+        expect(profile).to be_valid
       end
     end
 
     context "common field validations" do
-      it "validates phone format when present" do
-        profile = build(:profile, :teacher, user: user, phone: "invalid")
+      it "validates alternate_mobile_number format when present" do
+        profile = build(:profile, user: user, alternate_mobile_number: "invalid")
         expect(profile).not_to be_valid
-        expect(profile.errors[:phone]).to include("must be a valid phone number (10-15 digits, optional +)")
+        expect(profile.errors[:alternate_mobile_number]).to include("must be a valid phone number (10-15 digits, optional +)")
       end
 
-      it "allows valid phone formats" do
-        profile = build(:profile, :teacher, user: user, phone: "+1234567890")
+      it "allows valid alternate_mobile_number formats" do
+        profile = build(:profile, user: user, alternate_mobile_number: "+1234567890")
         expect(profile).to be_valid
       end
 
-      it "allows blank phone" do
-        profile = build(:profile, :teacher, user: user, phone: nil)
+      it "allows blank alternate_mobile_number" do
+        profile = build(:profile, user: user, alternate_mobile_number: nil)
         expect(profile).to be_valid
       end
 
       it "validates date_of_birth is in the past" do
-        profile = build(:profile, :teacher, user: user, date_of_birth: Date.tomorrow)
+        profile = build(:profile, user: user, date_of_birth: Date.tomorrow)
         expect(profile).not_to be_valid
         expect(profile.errors[:date_of_birth]).to include("must be less than #{Date.current}")
       end
 
       it "allows valid date_of_birth" do
-        profile = build(:profile, :teacher, user: user, date_of_birth: 30.years.ago)
+        profile = build(:profile, user: user, date_of_birth: 30.years.ago)
         expect(profile).to be_valid
       end
 
       it "allows blank date_of_birth" do
-        profile = build(:profile, :teacher, user: user, date_of_birth: nil)
+        profile = build(:profile, user: user, date_of_birth: nil)
         expect(profile).to be_valid
       end
     end
   end
 
-  describe "enum user_type" do
-    it "allows 'teacher' as user_type" do
-      profile = build(:profile, :teacher)
-      expect(profile.user_type).to eq("teacher")
+  describe "JSONB fields" do
+    let(:user) { create(:user) }
+
+    it "initializes teacher_detail as empty hash by default" do
+      profile = Profile.new(id: user.id)
+      expect(profile.teacher_detail).to eq({})
     end
 
-    it "allows 'student' as user_type" do
-      profile = build(:profile, :student)
-      expect(profile.user_type).to eq("student")
+    it "initializes student_details as empty hash by default" do
+      profile = Profile.new(id: user.id)
+      expect(profile.student_details).to eq({})
     end
 
-    it "is invalid with an invalid user_type" do
-      profile = build(:profile, :teacher)
-      profile.user_type = "invalid"
-      expect(profile).not_to be_valid
-      expect(profile.errors[:user_type]).to include("is not included in the list")
+    it "initializes experience as empty hash by default" do
+      profile = Profile.new(id: user.id)
+      expect(profile.experience).to eq({})
+    end
+
+    it "stores and retrieves teacher_detail hash" do
+      profile = create(:profile, :teacher, user: user)
+      expect(profile.teacher_detail).to be_a(Hash)
+      expect(profile.teacher_detail["subjects_taught"]).to be_present
+    end
+
+    it "stores and retrieves student_details hash" do
+      profile = create(:profile, :student, user: user)
+      expect(profile.student_details).to be_a(Hash)
+      expect(profile.student_details["grade_level"]).to be_present
     end
   end
 
-  describe "#teacher? and #student?" do
-    it "returns true for teacher? when user_type is teacher" do
-      profile = build(:profile, :teacher)
-      expect(profile.teacher?).to be true
-      expect(profile.student?).to be false
+  describe "composite primary key" do
+    let(:user) { create(:user) }
+
+    it "uses user.id as profile.id" do
+      profile = create(:profile, user: user)
+      expect(profile.id).to eq(user.id)
     end
 
-    it "returns true for student? when user_type is student" do
-      profile = build(:profile, :student)
-      expect(profile.student?).to be true
-      expect(profile.teacher?).to be false
+    it "enforces one profile per user via id constraint" do
+      create(:profile, user: user)
+      duplicate_profile = Profile.new(id: user.id, name: "Duplicate")
+      expect { duplicate_profile.save(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)
     end
   end
 

@@ -1,0 +1,25 @@
+{
+	"nodes":[
+		{"id":"users_node","type":"text","text":"## users\n---\n- **id**: uuid (PK)\n- **username**: string\n- **email**: string (UNIQUE, index)\n- **encrypted_password**: string\n- **mobile_number**: string (index)\n- **created_at**: datetime\n- **updated_at**: datetime\n- created_by: uuid(FK)\n- updated_by: uuid(FK)","x":-20,"y":60,"width":320,"height":240},
+		{"id":"profiles_node","type":"text","text":"## profiles\n---\n- **id**: uuid (PK = users.id)\n- name: string\n- steamer_id: integer (UNIQUE, index)\n- **bio**: text\n- **father_name**: string\n- **mother_name**: string\n- **avatar_url**: string\n- gender: string\n- **address**: text\n- **date_of_birth**: date\n- **teacher_detail**: json\n  // {years_of_experience, qualification, subjects: []}\n- **experience**: json\n  // [{type, description, duration, organization}]\n- **student_details**: json\n  // {grade, section, roll_number, enrollment_date}\n  // Note: School association via school_user table\n- **alternate_mobile_number**: string\n- **created_at**: datetime\n- **updated_at**: datetime\n- **created_by**: uuid (FK)\n- **updated_by**: uuid (FK)\n","x":-600,"y":-60,"width":300,"height":700},
+		{"id":"25a035f6e6bf0251","type":"text","text":"## group\n---\n- **id**: uuid (PK)\n- **name**: string\n- **about**: string\n- grades: string\n- **same_school:** boolean\n- **created_at**: datetime\n- **updated_at**: datetime\n- created_by: uuid(FK)\n- updated_by: uuid(FK)","x":230,"y":-270,"width":210,"height":250},
+		{"id":"de18f3c94124087c","type":"text","text":"## attendance\n---\n- **id**: uuid (PK)\n- **group_id**: uuid (FK, index)\n- **user_id**: uuid(FK)\n- **attendance_at**: datetime(index)\n- **created_at**: datetime\n- **updated_at**: datetime\n- created_by: uuid(FK)\n- updated_by: uuid(FK)","x":640,"y":-270,"width":260,"height":215},
+		{"id":"ed88984e866898c3","type":"text","text":"## group_user\n\n---\n- **group_id**: uuid (FK, composite PK with user_id, index)\n- **user_id**: uuid(FK, index)\n- relation:string(student, instructor, facilitator)\n- **created_at**: datetime\n- **updated_at**: datetime\n- created_by: uuid(FK)\n- updated_by: uuid(FK)","x":-200,"y":-280,"width":240,"height":270},
+		{"id":"hellos_node","type":"text","text":"## hellos\n---\n- **id**: uuid (PK)\n- **name**: string\n- **email**: string\n- **mobile_number**: string\n- **description**: text\n- **category**: string\n- **created_at**: datetime\n- **updated_at**: datetime","x":-230,"y":360,"width":300,"height":280},
+		{"id":"refresh_tokens_node","type":"text","text":"## refresh_tokens\n---\n- **id**: uuid (PK)\n- **user_id**: uuid (FK)\n- **token**: string\n- **expires_at**: datetime\n- **created_at**: datetime\n- **updated_at**: datetime\n- **created_by**: uuid(FK)\n- **updated_by**: uuid(FK)","x":660,"y":60,"width":260,"height":220},
+		{"id":"beb2b709f551c1a4","type":"text","text":"## school\n---\n- **id**: uuid (PK)\n- steamer_id: integer(UNIQUE, index)\n- **school_name**: string\n- **district**: string\n- city_village: string\n- **pincode**: integer\n- **landmark**: string\n- **address**: string\n- **created_at**: datetime\n- **updated_at**: datetime\n- created_by: uuid(FK)\n- updated_by: uuid(FK)","x":640,"y":320,"width":280,"height":320},
+		{"id":"80ebdda417c8577d","type":"text","text":"## school_user\n---\n- **school_id**: uuid (FK, composite PK with user)\n- **user_id**: uuid(FK)\n- relation: string (Instructor, Facilitator, student, principal)\n- **created_at**: datetime\n- **updated_at**: datetime\n- created_by: uuid(FK)\n- updated_by: uuid(FK)","x":140,"y":390,"width":300,"height":250},
+		{"id":"user_roles_node","type":"text","text":"## user_roles\n---\n- **user_id**: uuid (FK, Composite PK with role)\n- **role**: string\n- **created_at**: datetime\n- **updated_at**: datetime\n- created_by: uuid(FK)\n- updated_by: uuid(FK)","x":-580,"y":-280,"width":200,"height":210}
+	],
+	"edges":[
+		{"id":"edge_profiles_to_users","fromNode":"profiles_node","fromSide":"right","toNode":"users_node","toSide":"left","label":"has one"},
+		{"id":"edge_refresh_tokens_to_users","fromNode":"refresh_tokens_node","fromSide":"left","toNode":"users_node","toSide":"right","label":"belongs to"},
+		{"id":"d482a4b76ec71c88","fromNode":"25a035f6e6bf0251","fromSide":"right","toNode":"de18f3c94124087c","toSide":"left","label":"has many"},
+		{"id":"b7533770411c1ef0","fromNode":"25a035f6e6bf0251","fromSide":"left","toNode":"ed88984e866898c3","toSide":"right","label":"has many"},
+		{"id":"47822b8cfffb4367","fromNode":"users_node","fromSide":"top","toNode":"ed88984e866898c3","toSide":"right","label":"has many"},
+		{"id":"e7660526d88f1529","fromNode":"beb2b709f551c1a4","fromSide":"left","toNode":"80ebdda417c8577d","toSide":"right","label":"has many"},
+		{"id":"f28ad19252531bd2","fromNode":"users_node","fromSide":"bottom","toNode":"80ebdda417c8577d","toSide":"top","label":"has many"},
+		{"id":"4611ece45eddc556","fromNode":"users_node","fromSide":"right","toNode":"de18f3c94124087c","toSide":"left","label":"has many"},
+		{"id":"77745c6e77e7b19a","fromNode":"users_node","fromSide":"left","toNode":"user_roles_node","toSide":"right","label":"has many"}
+	]
+}

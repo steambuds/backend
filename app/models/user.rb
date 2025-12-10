@@ -14,7 +14,7 @@ class User < ApplicationRecord
 
   has_many :refresh_tokens, dependent: :destroy
   has_many :user_roles, dependent: :destroy
-  has_one :profile, dependent: :destroy
+  has_one :profile, foreign_key: :id, dependent: :destroy
 
   def roles
     user_roles.map(&:role)

@@ -22,7 +22,8 @@ module Api
         return render json: { errors: [ "User has already been taken" ] }, status: :unprocessable_entity
       end
 
-      profile = current_user.build_profile(profile_params)
+      profile = Profile.new(profile_params)
+      profile.id = current_user.id
 
       if profile.save
         render json: profile, status: :created
@@ -55,25 +56,26 @@ module Api
     end
 
     def authorize_profile_access!
-      unless @profile.user_id == current_user.id || current_user.has_role?(:admin)
+      unless @profile.id == current_user.id || current_user.has_role?(:admin)
         render json: { error: "Forbidden: You can only access your own profile" }, status: :forbidden
       end
     end
 
     def profile_params
       params.permit(
-        :user_type,
+        :name,
+        :steamer_id,
+        :father_name,
+        :mother_name,
+        :gender,
         :bio,
         :avatar_url,
-        :phone,
+        :alternate_mobile_number,
         :address,
         :date_of_birth,
-        :subjects_taught,
-        :years_experience,
-        :qualification,
-        :grade_level,
-        :enrollment_date,
-        :parent_contact
+        teacher_detail: {},
+        student_details: {},
+        experience: {}
       )
     end
   end
