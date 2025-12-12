@@ -189,10 +189,33 @@ RSpec.describe "Api::Users", type: :request do
     end
 
     context "without admin role" do
-      it "returns 403 Forbidden" do
+      before do
+        create(:profile, :teacher, user: regular_user)
+      end
+
+      it "allows user to access their own data" do
         get "/api/users/#{regular_user.id}", headers: { 'Authorization' => "Bearer #{regular_token}" }
 
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body)
+        expect(json['id']).to eq(regular_user.id)
+        expect(json['username']).to eq('regular')
+      end
+
+      it "includes profile information when accessing own data" do
+        get "/api/users/#{regular_user.id}", headers: { 'Authorization' => "Bearer #{regular_token}" }
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body)
+        expect(json['profile']).to be_present
+      end
+
+      it "returns 403 Forbidden when trying to access another user's data" do
+        get "/api/users/#{admin_user.id}", headers: { 'Authorization' => "Bearer #{regular_token}" }
+
         expect(response).to have_http_status(:forbidden)
+        json = JSON.parse(response.body)
+        expect(json['error']).to eq('Forbidden: You can only access your own user data')
       end
     end
 

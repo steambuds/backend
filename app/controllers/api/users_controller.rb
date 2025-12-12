@@ -1,7 +1,9 @@
 module Api
   class UsersController < ApplicationController
-    before_action -> { authorize_role!(:admin) }
+    before_action -> { authorize_role!(:admin) }, except: [ :show ]
+    before_action :authenticate_request!, only: [ :show ]
     before_action :set_user, only: [ :show, :add_role, :remove_role, :update_roles ]
+    before_action :authorize_user_access!, only: [ :show ]
 
     # GET /api/users
     def index
@@ -127,6 +129,13 @@ module Api
       @user = User.find(params[:id])
     rescue ActiveRecord::RecordNotFound
       render json: { error: "User not found" }, status: :not_found
+    end
+
+    def authorize_user_access!
+      # Allow if user is admin OR accessing their own data
+      unless current_user.has_role?(:admin) || current_user.id == @user.id
+        render json: { error: "Forbidden: You can only access your own user data" }, status: :forbidden
+      end
     end
 
     def apply_search(users)
