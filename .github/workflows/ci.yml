@@ -4,8 +4,8 @@ on:
   pull_request:
   push:
     branches: [ main ]
-    tags:
-      - 'v*'
+  release:
+    types: [ published ]
 
 jobs:
   scan_ruby:
@@ -88,8 +88,8 @@ jobs:
 
   docker:
     runs-on: ubuntu-latest
-    # Only build and push on tag pushes (e.g., v1.0.0)
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    # Only build and push when a GitHub release is published
+    if: github.event_name == 'release' && github.event.action == 'published'
     needs: [scan_ruby, lint, test]
     permissions:
       contents: read
