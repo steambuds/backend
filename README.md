@@ -280,4 +280,3 @@ For complete API documentation with curl examples, see [routes_documentation.md]
 ## Support
 
 For issues or questions, please open an issue on GitHub.
-

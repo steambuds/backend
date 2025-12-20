@@ -422,6 +422,13 @@ end
 
 All API endpoints are namespaced under `/api` and return JSON:
 
+### Status Endpoint (Public)
+```ruby
+GET    /                  # API status, version, and health check
+```
+
+Returns version, revision, server info, and database status. See Version Tracking section above.
+
 ### Authentication Endpoints (Public)
 ```ruby
 POST   /api/user          # User registration
@@ -467,9 +474,67 @@ POST   /api/hello         # Create hello
 
 See `routes_documentation.md` for detailed curl examples with request/response formats.
 
+## Version Tracking
+
+The API automatically displays version information from git tags.
+
+**Status Endpoint** (app/controllers/status_controller.rb)
+- Root endpoint `GET /` returns version, revision, server info, and database status
+- Version comes from `APP_VERSION` environment variable (set during Docker build) or git tags in development
+- Revision comes from `GIT_SHA` environment variable or git commit SHA
+
+**Version Initializer** (config/initializers/version.rb)
+- Exposes `SteamBuds::Backend.version` and `SteamBuds::Backend.revision`
+- Automatically detects version from environment variables or git commands
+- Falls back to "unknown" if neither is available
+
+**Example Response:**
+```json
+{
+  "status": "ok",
+  "version": "v1.2.3",
+  "revision": "abc123f",
+  "server": {"environment": "production", "rails_version": "8.1.1", "ruby_version": "3.4.5"},
+  "database": {"connected": true, "adapter": "PostgreSQL", "database": "backend_production"}
+}
+```
+
+See `VERSION_TRACKING.md` for complete documentation.
+
+## Docker & CI/CD
+
+**Docker Images**
+- Automatically built and published to GitHub Container Registry (ghcr.io) when releases are published
+- Images tagged with semantic versioning: `latest`, `1.2.3`, `1.2`, `1`
+- Version and git SHA injected during build via build arguments
+
+**GitHub Actions** (.github/workflows/ci.yml)
+- Triggers on: pull requests, pushes to main, and release publication
+- Runs security scans (Brakeman), linting (Rubocop), and tests (RSpec)
+- Builds and pushes Docker images only when GitHub release is published
+- Automatically passes release tag as `APP_VERSION` and commit SHA as `GIT_SHA`
+
+**Dockerfile**
+- Multi-stage build optimized for production
+- Accepts `APP_VERSION` and `GIT_SHA` build arguments
+- Sets them as environment variables for runtime version detection
+- Includes entrypoint script that removes stale PID files
+
+**Docker Compose** (docker-compose.yml)
+- Development environment with PostgreSQL 18
+- Supports version environment variables via `APP_VERSION` and `GIT_SHA`
+- Helper script `docker-compose.sh` auto-detects version from git
+
+**Publishing Workflow:**
+1. Publish GitHub release: `gh release create v1.0.0 --title "Release" --notes "Changes"`
+2. GitHub Actions runs tests and builds Docker image with version
+3. Image published to `ghcr.io/steambuds/backend:1.0.0` and `:latest`
+
+See `DOCKER_PUBLISHING.md` and `DOCKER_QUICK_REFERENCE.md` for complete documentation.
+
 ## Deployment
 
-The project includes Kamal configuration for deployment (config/deploy.yml).
+The project includes Kamal configuration for deployment (config/deploy.yml). Docker images can be deployed directly from GitHub Container Registry.
 
 ## Environment Setup
 
