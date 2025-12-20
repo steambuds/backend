@@ -234,6 +234,7 @@ See [DOCKER_PUBLISHING.md](./DOCKER_PUBLISHING.md) for production deployment exa
 
 - **[DOCKER_PUBLISHING.md](./DOCKER_PUBLISHING.md)** - Complete Docker publishing workflow with diagrams and best practices
 - **[DOCKER_QUICK_REFERENCE.md](./DOCKER_QUICK_REFERENCE.md)** - Quick reference for common Docker commands
+- **[VERSION_TRACKING.md](./VERSION_TRACKING.md)** - How version tracking works with git tags
 
 ### Database Documentation
 

@@ -17,7 +17,11 @@ services:
       retries: 5
 
   api:
-    build: .
+    build:
+      context: .
+      args:
+        APP_VERSION: ${APP_VERSION:-development}
+        GIT_SHA: ${GIT_SHA:-local}
     command: ./bin/rails server -b 0.0.0.0
     volumes:
       - .:/rails
@@ -31,6 +35,8 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: backend_production
       DATABASE_URL: postgres://postgres:postgres@db:5432/backend_production
+      APP_VERSION: ${APP_VERSION:-development}
+      GIT_SHA: ${GIT_SHA:-local}
     depends_on:
       db:
         condition: service_healthy

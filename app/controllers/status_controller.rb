@@ -5,6 +5,8 @@ class StatusController < ApplicationController
     render json: {
       status: "ok",
       timestamp: Time.current.iso8601,
+      version: SteamBuds::Backend.version,
+      revision: SteamBuds::Backend.revision,
       server: {
         environment: Rails.env,
         rails_version: Rails.version,

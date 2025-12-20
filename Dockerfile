@@ -11,6 +11,10 @@
 ARG RUBY_VERSION=3.4.5
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
+# Version information
+ARG APP_VERSION=development
+ARG GIT_SHA=unknown
+
 # Rails app lives here
 WORKDIR /rails
 
@@ -23,7 +27,9 @@ RUN apt-get update -qq && \
 ENV RAILS_ENV="production" \
     BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development"
+    BUNDLE_WITHOUT="development" \
+    APP_VERSION="${APP_VERSION}" \
+    GIT_SHA="${GIT_SHA}"
 
 # Throw-away build stage to reduce size of final image
 FROM base AS build
