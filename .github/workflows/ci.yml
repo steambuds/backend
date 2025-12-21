@@ -163,7 +163,7 @@ jobs:
 
       - name: Deploy to GKE
         run: |
-          # Strip 'v' prefix from tag (v0.1.6 -> 0.1.6) to match Docker image tag
+          # Strip 'v' prefix from tag (v0.x.x -> 0.x.x) to match Docker image tag
           TAG_VERSION="${{ github.event.release.tag_name }}"
           TAG_VERSION="${TAG_VERSION#v}"
 
