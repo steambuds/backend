@@ -163,9 +163,12 @@ jobs:
 
       - name: Deploy to GKE
         run: |
+          # Strip 'v' prefix from tag (v0.1.6 -> 0.1.6) to match Docker image tag
+          TAG_VERSION="${{ github.event.release.tag_name }}"
+          TAG_VERSION="${TAG_VERSION#v}"
+
           kubectl set image deployment/rails-app \
-            rails=ghcr.io/${{ github.repository }}:${{ github.event.release.tag_name }} \
-            --record
+            rails=ghcr.io/${{ github.repository }}:${TAG_VERSION}
 
           kubectl rollout status deployment/rails-app --timeout=5m
 
