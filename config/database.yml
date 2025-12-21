@@ -85,7 +85,9 @@ production:
   primary: &primary_production
     <<: *default
     database: backend_production
-  # Use the same database for queue and cable to simplify infrastructure
+  # Use the same database for cache, queue and cable to simplify infrastructure
+  cache:
+    <<: *primary_production
   queue:
     <<: *primary_production
   cable:
