@@ -7,16 +7,21 @@ RSpec.describe User, type: :model do
     expect(subject).to be_valid
   end
 
-  it "is invalid without a username" do
+  it "is valid without a username" do
     subject.username = nil
-    expect(subject).not_to be_valid
-    expect(subject.errors[:username]).to include("can't be blank")
+    expect(subject).to be_valid
   end
 
-  it "requires unique username" do
+  it "requires unique username when present" do
     create(:user, username: subject.username)
     expect(subject).not_to be_valid
     expect(subject.errors[:username]).to include("has already been taken")
+  end
+
+  it "allows multiple users with nil username" do
+    create(:user, username: nil)
+    subject.username = nil
+    expect(subject).to be_valid
   end
 
   it "is valid without an email if mobile_number is present" do

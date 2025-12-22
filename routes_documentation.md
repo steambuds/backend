@@ -4,7 +4,7 @@
 
 ### User Registration
 
-Creates a new user account with profile and role.
+Creates a new user account with profile and role. `username` and `role` are optional.
 
 **Endpoint:** `POST /api/user`
 
@@ -18,12 +18,11 @@ curl -X POST -H "Content-Type: application/json" -d '{
   "role": "student",
   "name": "Test User",
   "gender": "male",
-  "address": "123 Test Lane",
   "date_of_birth": "2000-01-01"
 }' http://localhost:8000/api/user
 ```
 
-**Allowed Roles:** `student`, `teacher`, `guardian`
+**Allowed Roles:** `student`, `teacher`, `guardian` (optional)
 
 **Response:**
 ```json
@@ -34,10 +33,10 @@ curl -X POST -H "Content-Type: application/json" -d '{
   "roles": ["student"],
   "profile": {
     "id": "uuid",
-    "steamer_id": 9000001,
+    "steamer_id": null,
     "name": "Test User",
     "gender": "male",
-    "address": "123 Test Lane",
+    "address": {},
     "date_of_birth": "2000-01-01",
     ...
   }
@@ -266,11 +265,13 @@ curl -H "Authorization: Bearer your_access_token" \
 **Response:**
 ```json
 [
-  {
-    "id": "uuid",
-    "name": "Arjun Kumar",
-    "steamer_id": 9000001,
-    "father_name": "Rajesh Kumar",
+    {
+      "id": "uuid",
+      "name": "Arjun Kumar",
+      "steamer_id": 9000001,
+      "steamer_id": 9000001,
+      "father_name": "Rajesh Kumar",
+  
     "mother_name": "Priya Kumar",
     "gender": "male",
     "bio": "A passionate student.",
@@ -312,8 +313,10 @@ curl -H "Authorization: Bearer your_access_token" \
 {
   "id": "uuid",
   "name": "Arjun Kumar",
+      "steamer_id": 9000001,
   "steamer_id": 9000001,
   "father_name": "Rajesh Kumar",
+
   "mother_name": "Priya Kumar",
   "gender": "male",
   "bio": "A passionate student.",
@@ -406,8 +409,8 @@ curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer your_
 {
   "id": "uuid",
   "name": "Arjun Kumar",
-  "steamer_id": 9000001,
-  "father_name": "Rajesh Kumar",
+      "steamer_id": 9000001,
+    "father_name": "Rajesh Kumar",
   "mother_name": "Priya Kumar",
   "gender": "male",
   "bio": "A passionate student.",
@@ -611,8 +614,8 @@ curl -X GET -H "Authorization: Bearer your_access_token" \
   "profile": {
     "id": "profile_uuid",
     "name": "John Doe",
-    "steamer_id": 9000001,
-    "father_name": "Robert Doe",
+        "steamer_id": 9000001,
+        "father_name": "Robert Doe",
     "mother_name": "Jane Doe",
     "gender": "male",
     "bio": "Experienced mathematics teacher",
@@ -834,7 +837,6 @@ curl -H "Authorization: Bearer your_access_token" \
 [
   {
     "user_id": "student-uuid-1",
-    "steamer_id": 9000008,
     "name": "Aarav Patel",
     "stats": {
       "present": 18,
@@ -853,7 +855,6 @@ curl -H "Authorization: Bearer your_access_token" \
   },
   {
     "user_id": "student-uuid-2",
-    "steamer_id": 9000009,
     "name": "Diya Reddy",
     "stats": {
       "present": 20,
@@ -875,7 +876,6 @@ curl -H "Authorization: Bearer your_access_token" \
 
 **Response Fields:**
 - `user_id`: Student's UUID
-- `steamer_id`: Student's unique steamer ID (used for external integrations)
 - `name`: Student's full name
 - `stats`: Aggregate counts of each attendance status
   - `present`: Number of days marked present

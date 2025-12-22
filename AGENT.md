@@ -261,8 +261,8 @@ The application implements a complete JWT-based authentication system with refre
 The database uses UUID primary keys and follows an audit trail pattern with `created_by` and `updated_by` fields on most tables (except hellos). Complete schema documented in `database.canvas`.
 
 **Core Tables:**
-- **users:** uuid id (PK), username, email (unique indexed), encrypted_password, mobile_number (indexed), roles (text array), created_by, updated_by
-- **profiles:** Composite PK where id = users.id, contains JSONB field (roll_specific_detail), steamer_id (unique), name, bio, avatar_url, father_name, mother_name, gender, alternate_mobile_number, date_of_birth
+- **users:** uuid id (PK), username (nullable, unique), email (unique indexed), encrypted_password, mobile_number (indexed), roles (text array), created_by, updated_by
+- **profiles:** Composite PK where id = users.id, contains JSONB field (roll_specific_detail), steamer_id (nullable, unique), name, bio, avatar_url, father_name, mother_name, gender, alternate_mobile_number, date_of_birth, address (jsonb)
 - **refresh_tokens:** uuid id, user_id FK, token (indexed), expires_at
 
 **School Management:**
@@ -405,13 +405,14 @@ end
 **Profile Model** (app/models/profile.rb)
 - One-to-one with User using composite PK where `profiles.id = users.id`
 - User type determined by user_roles (teacher/student roles), not stored in profile
-- Common fields: name, bio, avatar_url, gender, address, date_of_birth, father_name, mother_name, alternate_mobile_number
+- Common fields: name, bio, avatar_url, gender, father_name, mother_name, alternate_mobile_number, date_of_birth
+- `steamer_id` is a nullable, unique integer for external system integration.
+- `address` is a `jsonb` field to store structured address data.
 - JSONB fields for flexible data:
   - `roll_specific_detail`: Stores both teacher and student data
     - teacher: {years_of_experience, qualification, subjects: []}
     - student: {grade, section, roll_number, enrollment_date}
   - `experience`: [{type, description, duration, organization}]
-- Unique `steamer_id` for external system integration
 
 **Authorization Pattern** (app/controllers/api/profiles_controller.rb)
 - All endpoints require JWT authentication

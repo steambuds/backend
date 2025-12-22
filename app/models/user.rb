@@ -5,7 +5,7 @@ class User < ApplicationRecord
 
   attr_accessor :password
 
-  validates :username, presence: true, uniqueness: true
+  validates :username, uniqueness: true, allow_nil: true
   validates :email, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
   validates :mobile_number, uniqueness: true, format: { with: MOBILE_NUMBER_REGEX, message: "must be a valid mobile number (10-15 digits, optional +)" }, allow_blank: true
   validates :password, presence: true, length: { minimum: 8 },
