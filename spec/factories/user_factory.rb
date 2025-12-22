@@ -9,16 +9,20 @@ FactoryBot.define do
       roles { [ :admin ] }
     end
 
-    trait :system_user do
-      roles { [ :system_user ] }
+    trait :system do
+      roles { [ :system ] }
     end
 
-    trait :instructor do
-      roles { [ :instructor ] }
+    trait :school_admin do
+      roles { [ :school_admin ] }
     end
 
-    trait :facilitator do
-      roles { [ :facilitator ] }
+    trait :teacher do
+      roles { [ :teacher ] }
+    end
+
+    trait :guardian do
+      roles { [ :guardian ] }
     end
 
     trait :student do

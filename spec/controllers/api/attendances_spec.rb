@@ -1,13 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe "Api::Attendances", type: :request do
-  let(:user) { create(:user, :instructor) } # The teacher
+  let(:user) { create(:user, :teacher) } # The teacher
   let(:headers) { { 'Authorization' => "Bearer #{token}" } }
   let(:token) { JsonWebToken.encode(user_id: user.id) }
   let(:group) { create(:group) }
 
   before do
-    create(:group_user, :instructor, user: user, group: group)
+    create(:group_user, :teacher, user: user, group: group)
   end
 
   describe "GET /api/groups/:group_id/attendances" do

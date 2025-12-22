@@ -1,13 +1,35 @@
 # Tasks
 
 ## Active Tasks
-- **STEAM-11**: Attendance Dashboard API Endpoints (Status: completed)
-- **STEAM-10**: Database Schema Migration Updates (Status: completed)
 
 ## Completed Tasks
 - **STEAM-9**: User Management Dashboard API (Completed: 2025-12-09)
+- **STEAM-10**: Database Schema Migration Updates (Status: 2025-12-08)
 - **STEAM-11**: Attendance Dashboard API Endpoints (Completed: 2025-12-10)
+- **STEAM-12**: Update Role Enum and Renaming (Completed: 2025-12-22)
 
+
+## Task: STEAM-12 - Update Role Enum and Renaming
+
+**ID:** STEAM-12
+**Title:** Update Role Enum and Renaming
+**Status:** completed
+**Created:** 2025-12-22
+**Completed:** 2025-12-22
+
+### Description
+Update the `Role` enum to support a specific set of 6 roles: `admin`, `school_admin`, `teacher`, `student`, `system`, `guardian`. This involves renaming existing roles (e.g., `instructor` -> `teacher`, `system_user` -> `system`) and removing unused ones (`facilitator`).
+
+### Context
+- **Refactoring:** Widespread changes across codebase, tests, seeds, and documentation.
+- **TDD:** Used Red-Green-Refactor approach to ensure no regression.
+
+### Changes
+- **Enum:** Updated `app/enums/role.rb`.
+- **Code:** Updated `AttendancesController` authorization logic.
+- **Tests:** Updated factories and specs (`user_spec`, `group_user_spec`, `authorizable_spec`, `attendances_spec`, etc.).
+- **Seeds:** Updated `db/seeds.rb` to use new roles.
+- **Docs:** Updated `AGENT.md` and `routes_documentation.md`.
 
 ## Task: STEAM-11 - Attendance Dashboard API Endpoints
 

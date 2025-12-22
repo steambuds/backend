@@ -29,8 +29,8 @@ RSpec.describe GroupUser, type: :model do
     end
 
     it 'requires user to have the role' do
-      facilitator_user = create(:user, roles: [ :facilitator ])
-      group_user = GroupUser.new(group: group, user: facilitator_user, relation: "student")
+      teacher_user = create(:user, roles: [ :teacher ])
+      group_user = GroupUser.new(group: group, user: teacher_user, relation: "student")
       expect(group_user).not_to be_valid
       expect(group_user.errors[:base]).to include("User must have the 'student' role to be assigned as student in a group")
     end

@@ -36,7 +36,7 @@ RSpec.describe 'PaperTrail Integration', type: :model do
 
   xdescribe 'Cross-model version queries' do
     let(:admin) { create(:user, roles: [ :admin ]) }
-    let(:teacher) { create(:user, roles: [ :instructor ]) }
+    let(:teacher) { create(:user, roles: [ :teacher ]) }
     let(:group) { create(:group) }
 
     it 'can query all versions by a specific user' do
@@ -80,7 +80,7 @@ RSpec.describe 'PaperTrail Integration', type: :model do
   end
 
   xdescribe 'Audit trail queries' do
-    let(:teacher) { create(:user, roles: [ :instructor ]) }
+    let(:teacher) { create(:user, roles: [ :teacher ]) }
     let(:student) { create(:user, roles: [ :student ]) }
     let(:group) { create(:group) }
 

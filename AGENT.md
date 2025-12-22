@@ -218,7 +218,7 @@ The application implements a complete JWT-based authentication system with refre
 
 **Role Enum** (app/enums/role.rb)
 - Centralized role definitions as Ruby symbols
-- Available roles: :admin, :system_user, :instructor, :facilitator, :student
+- Available roles: :admin, :school_admin, :teacher, :student, :system, :guardian
 - Used across User.roles, GroupUser.relation, and SchoolUser.relation
 - Validates that roles are from approved list
 
@@ -310,10 +310,11 @@ The application includes role-based authorization through the **Authorizable con
 
 **Available Roles:**
 - `:admin` - Administrator role with full access to all protected endpoints
-- `:system_user` - System/automated process role
-- `:instructor` - Teacher role for leading groups and marking attendance
-- `:facilitator` - Community facilitator role for supporting groups
+- `:school_admin` - School administrator role
+- `:teacher` - Teacher role for leading groups and marking attendance
 - `:student` - Student role for group membership and attendance tracking
+- `:system` - System/automated process role
+- `:guardian` - Guardian role for students
 
 **Authorizable Concern:**
 - Included in ApplicationController

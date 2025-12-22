@@ -54,65 +54,73 @@ admin = create_user("Ghanshyam", [ :admin ], {
   date_of_birth: Date.new(1985, 5, 15)
 })
 
-# 2. Teachers/Instructors (4 users)
-teacher1 = create_user("Priya Sharma", [ :instructor ], {
+# 2. Teachers (4 users)
+teacher1 = create_user("Priya Sharma", [ :teacher ], {
   roll_specific_detail: {
-    qualification: "B.Ed in Mathematics, M.Sc Mathematics",
-    years_of_experience: 5,
-    subjects: [ "Mathematics", "Physics", "Computer Science" ]
+    teacher: {
+      qualification: "B.Ed in Mathematics, M.Sc Mathematics",
+      years_of_experience: 5,
+      subjects: [ "Mathematics", "Physics", "Computer Science" ]
+    }
   },
   bio: "Senior Mathematics Teacher - Manages multiple STEAM groups",
   gender: "female",
   date_of_birth: Date.new(1990, 3, 20)
 })
 
-teacher2 = create_user("Rajesh Kumar", [ :instructor ], {
+teacher2 = create_user("Rajesh Kumar", [ :teacher ], {
   roll_specific_detail: {
-    qualification: "M.Sc in Biology, B.Ed",
-    years_of_experience: 8,
-    subjects: [ "Biology", "Chemistry", "Environmental Science" ]
+    teacher: {
+      qualification: "M.Sc in Biology, B.Ed",
+      years_of_experience: 8,
+      subjects: [ "Biology", "Chemistry", "Environmental Science" ]
+    }
   },
   bio: "Science Teacher - Sunnydale High School",
   gender: "male",
   date_of_birth: Date.new(1987, 7, 10)
 })
 
-teacher3 = create_user("Meera Iyer", [ :instructor ], {
+teacher3 = create_user("Meera Iyer", [ :teacher ], {
   roll_specific_detail: {
-    qualification: "B.Tech Computer Science, M.Ed",
-    years_of_experience: 6,
-    subjects: [ "Computer Science", "Robotics", "AI & ML" ]
+    teacher: {
+      qualification: "B.Tech Computer Science, M.Ed",
+      years_of_experience: 6,
+      subjects: [ "Computer Science", "Robotics", "AI & ML" ]
+    }
   },
   bio: "Technology & Innovation Teacher",
   gender: "female",
   date_of_birth: Date.new(1989, 6, 15)
 })
 
-teacher4 = create_user("Amit Patel", [ :instructor ], {
+teacher4 = create_user("Amit Patel", [ :teacher ], {
   roll_specific_detail: {
-    qualification: "M.Sc Physics, B.Ed",
-    years_of_experience: 10,
-    subjects: [ "Physics", "Mathematics", "Engineering Design" ]
+    teacher: {
+      qualification: "M.Sc Physics, B.Ed",
+      years_of_experience: 10,
+      subjects: [ "Physics", "Mathematics", "Engineering Design" ]
+    }
   },
   bio: "Senior Physics Teacher & STEAM Coordinator",
   gender: "male",
   date_of_birth: Date.new(1985, 11, 8)
 })
 
-# 3. Facilitators (3 users)
-facilitator1 = create_user("Anjali Verma", [ :facilitator ], {
+# 3. Facilitators (converted to Teachers) (3 users)
+facilitator1 = create_user("Anjali Verma", [ :teacher ], {
   bio: "Community Facilitator - STEAM Program Coordinator",
   gender: "female",
   date_of_birth: Date.new(1992, 9, 5)
 })
 
-facilitator2 = create_user("Vikram Singh", [ :facilitator ], {
+facilitator2 = create_user("Vikram Singh", [ :teacher ], {
   bio: "Field Facilitator - Student Support Specialist",
   gender: "male",
   date_of_birth: Date.new(1988, 11, 25)
 })
 
-facilitator3 = create_user("Kavita Deshmukh", [ :facilitator ], {
+facilitator3 = create_user("Kavita Deshmukh", [ :teacher ], {
   bio: "Program Facilitator - Group Activities Coordinator",
   gender: "female",
   date_of_birth: Date.new(1991, 4, 18)
@@ -170,10 +178,12 @@ student_data = [
 students = student_data.map do |s|
   create_user(s[:name], [ :student ], {
     roll_specific_detail: {
-      grade: s[:grade],
-      section: s[:section],
-      roll_number: rand(1..50),
-      enrollment_date: Date.today - rand(365..730).days
+      student: {
+        grade: s[:grade],
+        section: s[:section],
+        roll_number: rand(1..50),
+        enrollment_date: Date.today - rand(365..730).days
+      }
     },
     gender: s[:gender],
     date_of_birth: s[:dob],
@@ -226,27 +236,27 @@ puts "  ✓ #{school3.school_name} - #{school3.city_village}"
 puts "\n=== Assigning Users to Schools ==="
 
 # Teachers
-SchoolUser.create!(school: school1, user: teacher1, relation: :instructor, created_by: admin.id, updated_by: admin.id)
-puts "  ✓ #{teacher1.profile.name} → #{school1.school_name} (Instructor)"
+SchoolUser.create!(school: school1, user: teacher1, relation: :teacher, created_by: admin.id, updated_by: admin.id)
+puts "  ✓ #{teacher1.profile.name} → #{school1.school_name} (Teacher)"
 
-SchoolUser.create!(school: school2, user: teacher2, relation: :instructor, created_by: admin.id, updated_by: admin.id)
-puts "  ✓ #{teacher2.profile.name} → #{school2.school_name} (Instructor)"
+SchoolUser.create!(school: school2, user: teacher2, relation: :teacher, created_by: admin.id, updated_by: admin.id)
+puts "  ✓ #{teacher2.profile.name} → #{school2.school_name} (Teacher)"
 
-SchoolUser.create!(school: school1, user: teacher3, relation: :instructor, created_by: admin.id, updated_by: admin.id)
-puts "  ✓ #{teacher3.profile.name} → #{school1.school_name} (Instructor)"
+SchoolUser.create!(school: school1, user: teacher3, relation: :teacher, created_by: admin.id, updated_by: admin.id)
+puts "  ✓ #{teacher3.profile.name} → #{school1.school_name} (Teacher)"
 
-SchoolUser.create!(school: school3, user: teacher4, relation: :instructor, created_by: admin.id, updated_by: admin.id)
-puts "  ✓ #{teacher4.profile.name} → #{school3.school_name} (Instructor)"
+SchoolUser.create!(school: school3, user: teacher4, relation: :teacher, created_by: admin.id, updated_by: admin.id)
+puts "  ✓ #{teacher4.profile.name} → #{school3.school_name} (Teacher)"
 
-# Facilitators
-SchoolUser.create!(school: school1, user: facilitator1, relation: :facilitator, created_by: admin.id, updated_by: admin.id)
-puts "  ✓ #{facilitator1.profile.name} → #{school1.school_name} (Facilitator)"
+# Facilitators (now Teachers)
+SchoolUser.create!(school: school1, user: facilitator1, relation: :teacher, created_by: admin.id, updated_by: admin.id)
+puts "  ✓ #{facilitator1.profile.name} → #{school1.school_name} (Teacher)"
 
-SchoolUser.create!(school: school2, user: facilitator2, relation: :facilitator, created_by: admin.id, updated_by: admin.id)
-puts "  ✓ #{facilitator2.profile.name} → #{school2.school_name} (Facilitator)"
+SchoolUser.create!(school: school2, user: facilitator2, relation: :teacher, created_by: admin.id, updated_by: admin.id)
+puts "  ✓ #{facilitator2.profile.name} → #{school2.school_name} (Teacher)"
 
-SchoolUser.create!(school: school3, user: facilitator3, relation: :facilitator, created_by: admin.id, updated_by: admin.id)
-puts "  ✓ #{facilitator3.profile.name} → #{school3.school_name} (Facilitator)"
+SchoolUser.create!(school: school3, user: facilitator3, relation: :teacher, created_by: admin.id, updated_by: admin.id)
+puts "  ✓ #{facilitator3.profile.name} → #{school3.school_name} (Teacher)"
 
 # Students distribution: School1 (15), School2 (15), School3 (15)
 school1_students = students[0..14]
@@ -273,8 +283,8 @@ end
 
 puts "\n=== Creating 9 Groups ==="
 
-# Teacher1 (Priya Sharma) manages 5 groups - each with instructor + facilitator
-# GROUP 1: Math Champions - Grade 9 (Teacher1 + Facilitator1)
+# Teacher1 (Priya Sharma) manages 5 groups
+# GROUP 1: Math Champions - Grade 9
 group1 = Group.create!(
   name: "Math Champions - Grade 9A",
   about: "Advanced Mathematics and Problem Solving for Grade 9 students",
@@ -283,14 +293,14 @@ group1 = Group.create!(
   created_by: admin.id,
   updated_by: admin.id
 )
-GroupUser.create!(group: group1, user: teacher1, relation: :instructor, created_by: admin.id, updated_by: admin.id)
-GroupUser.create!(group: group1, user: facilitator1, relation: :facilitator, created_by: admin.id, updated_by: admin.id)
+GroupUser.create!(group: group1, user: teacher1, relation: :teacher, created_by: admin.id, updated_by: admin.id)
+GroupUser.create!(group: group1, user: facilitator1, relation: :teacher, created_by: admin.id, updated_by: admin.id)
 [ students[0], students[2], students[8], students[12], students[18] ].each do |student|
   GroupUser.create!(group: group1, user: student, relation: :student, created_by: admin.id, updated_by: admin.id)
 end
-puts "  📚 Group 1: #{group1.name} (Instructor: #{teacher1.profile.name}, Facilitator: #{facilitator1.profile.name}, Students: 5)"
+puts "  📚 Group 1: #{group1.name} (Teachers: #{teacher1.profile.name}, #{facilitator1.profile.name}, Students: 5)"
 
-# GROUP 2: Physics Lab - Grade 10 (Teacher1 + Facilitator1) - This will have 10+ attendance sessions
+# GROUP 2: Physics Lab - Grade 10
 group2 = Group.create!(
   name: "Physics Lab - Grade 10A",
   about: "Experimental Physics and Hands-on Projects for Grade 10",
@@ -299,14 +309,14 @@ group2 = Group.create!(
   created_by: admin.id,
   updated_by: admin.id
 )
-GroupUser.create!(group: group2, user: teacher1, relation: :instructor, created_by: admin.id, updated_by: admin.id)
-GroupUser.create!(group: group2, user: facilitator1, relation: :facilitator, created_by: admin.id, updated_by: admin.id)
+GroupUser.create!(group: group2, user: teacher1, relation: :teacher, created_by: admin.id, updated_by: admin.id)
+GroupUser.create!(group: group2, user: facilitator1, relation: :teacher, created_by: admin.id, updated_by: admin.id)
 [ students[4], students[5], students[6], students[10], students[16], students[20] ].each do |student|
   GroupUser.create!(group: group2, user: student, relation: :student, created_by: admin.id, updated_by: admin.id)
 end
-puts "  🔬 Group 2: #{group2.name} (Instructor: #{teacher1.profile.name}, Facilitator: #{facilitator1.profile.name}, Students: 6)"
+puts "  🔬 Group 2: #{group2.name} (Teachers: #{teacher1.profile.name}, #{facilitator1.profile.name}, Students: 6)"
 
-# GROUP 3: Computer Science Basics (Teacher1 + Facilitator1)
+# GROUP 3: Computer Science Basics
 group3 = Group.create!(
   name: "Computer Science Fundamentals",
   about: "Introduction to Programming and Computational Thinking",
@@ -315,14 +325,14 @@ group3 = Group.create!(
   created_by: admin.id,
   updated_by: admin.id
 )
-GroupUser.create!(group: group3, user: teacher1, relation: :instructor, created_by: admin.id, updated_by: admin.id)
-GroupUser.create!(group: group3, user: facilitator1, relation: :facilitator, created_by: admin.id, updated_by: admin.id)
+GroupUser.create!(group: group3, user: teacher1, relation: :teacher, created_by: admin.id, updated_by: admin.id)
+GroupUser.create!(group: group3, user: facilitator1, relation: :teacher, created_by: admin.id, updated_by: admin.id)
 [ students[1], students[7], students[14], students[21], students[28] ].each do |student|
   GroupUser.create!(group: group3, user: student, relation: :student, created_by: admin.id, updated_by: admin.id)
 end
-puts "  💻 Group 3: #{group3.name} (Instructor: #{teacher1.profile.name}, Facilitator: #{facilitator1.profile.name}, Students: 5)"
+puts "  💻 Group 3: #{group3.name} (Teachers: #{teacher1.profile.name}, #{facilitator1.profile.name}, Students: 5)"
 
-# GROUP 4: Algebra & Geometry (Teacher1 + Facilitator1)
+# GROUP 4: Algebra & Geometry
 group4 = Group.create!(
   name: "Algebra & Geometry Workshop",
   about: "Deep dive into Algebraic structures and Geometric proofs",
@@ -331,14 +341,14 @@ group4 = Group.create!(
   created_by: admin.id,
   updated_by: admin.id
 )
-GroupUser.create!(group: group4, user: teacher1, relation: :instructor, created_by: admin.id, updated_by: admin.id)
-GroupUser.create!(group: group4, user: facilitator1, relation: :facilitator, created_by: admin.id, updated_by: admin.id)
+GroupUser.create!(group: group4, user: teacher1, relation: :teacher, created_by: admin.id, updated_by: admin.id)
+GroupUser.create!(group: group4, user: facilitator1, relation: :teacher, created_by: admin.id, updated_by: admin.id)
 [ students[3], students[9], students[15], students[22] ].each do |student|
   GroupUser.create!(group: group4, user: student, relation: :student, created_by: admin.id, updated_by: admin.id)
 end
-puts "  📐 Group 4: #{group4.name} (Instructor: #{teacher1.profile.name}, Facilitator: #{facilitator1.profile.name}, Students: 4)"
+puts "  📐 Group 4: #{group4.name} (Teachers: #{teacher1.profile.name}, #{facilitator1.profile.name}, Students: 4)"
 
-# GROUP 5: STEAM Integration (Teacher1 + Facilitator1)
+# GROUP 5: STEAM Integration
 group5 = Group.create!(
   name: "STEAM Integration Lab",
   about: "Cross-disciplinary projects combining Science, Tech, Engineering, Art & Math",
@@ -347,12 +357,12 @@ group5 = Group.create!(
   created_by: admin.id,
   updated_by: admin.id
 )
-GroupUser.create!(group: group5, user: teacher1, relation: :instructor, created_by: admin.id, updated_by: admin.id)
-GroupUser.create!(group: group5, user: facilitator1, relation: :facilitator, created_by: admin.id, updated_by: admin.id)
+GroupUser.create!(group: group5, user: teacher1, relation: :teacher, created_by: admin.id, updated_by: admin.id)
+GroupUser.create!(group: group5, user: facilitator1, relation: :teacher, created_by: admin.id, updated_by: admin.id)
 [ students[11], students[17], students[23], students[29], students[35], students[40] ].each do |student|
   GroupUser.create!(group: group5, user: student, relation: :student, created_by: admin.id, updated_by: admin.id)
 end
-puts "  🎨 Group 5: #{group5.name} (Instructor: #{teacher1.profile.name}, Facilitator: #{facilitator1.profile.name}, Students: 6)"
+puts "  🎨 Group 5: #{group5.name} (Teachers: #{teacher1.profile.name}, #{facilitator1.profile.name}, Students: 6)"
 
 # GROUP 6: Biology Explorers (Teacher2)
 group6 = Group.create!(
@@ -363,11 +373,11 @@ group6 = Group.create!(
   created_by: admin.id,
   updated_by: admin.id
 )
-GroupUser.create!(group: group6, user: teacher2, relation: :instructor, created_by: admin.id, updated_by: admin.id)
+GroupUser.create!(group: group6, user: teacher2, relation: :teacher, created_by: admin.id, updated_by: admin.id)
 [ students[13], students[19], students[24], students[30] ].each do |student|
   GroupUser.create!(group: group6, user: student, relation: :student, created_by: admin.id, updated_by: admin.id)
 end
-puts "  🧬 Group 6: #{group6.name} (Instructor: #{teacher2.profile.name}, Students: 4)"
+puts "  🧬 Group 6: #{group6.name} (Teacher: #{teacher2.profile.name}, Students: 4)"
 
 # GROUP 7: Robotics & AI (Teacher3)
 group7 = Group.create!(
@@ -378,12 +388,12 @@ group7 = Group.create!(
   created_by: admin.id,
   updated_by: admin.id
 )
-GroupUser.create!(group: group7, user: teacher3, relation: :instructor, created_by: admin.id, updated_by: admin.id)
-GroupUser.create!(group: group7, user: facilitator2, relation: :facilitator, created_by: admin.id, updated_by: admin.id)
+GroupUser.create!(group: group7, user: teacher3, relation: :teacher, created_by: admin.id, updated_by: admin.id)
+GroupUser.create!(group: group7, user: facilitator2, relation: :teacher, created_by: admin.id, updated_by: admin.id)
 [ students[25], students[31], students[36], students[41], students[42] ].each do |student|
   GroupUser.create!(group: group7, user: student, relation: :student, created_by: admin.id, updated_by: admin.id)
 end
-puts "  🤖 Group 7: #{group7.name} (Instructor: #{teacher3.profile.name}, Facilitator: #{facilitator2.profile.name}, Students: 5)"
+puts "  🤖 Group 7: #{group7.name} (Teachers: #{teacher3.profile.name}, #{facilitator2.profile.name}, Students: 5)"
 
 # GROUP 8: Engineering Design (Teacher4)
 group8 = Group.create!(
@@ -394,11 +404,11 @@ group8 = Group.create!(
   created_by: admin.id,
   updated_by: admin.id
 )
-GroupUser.create!(group: group8, user: teacher4, relation: :instructor, created_by: admin.id, updated_by: admin.id)
+GroupUser.create!(group: group8, user: teacher4, relation: :teacher, created_by: admin.id, updated_by: admin.id)
 [ students[26], students[32], students[37], students[43] ].each do |student|
   GroupUser.create!(group: group8, user: student, relation: :student, created_by: admin.id, updated_by: admin.id)
 end
-puts "  ⚙️  Group 8: #{group8.name} (Instructor: #{teacher4.profile.name}, Students: 4)"
+puts "  ⚙️  Group 8: #{group8.name} (Teacher: #{teacher4.profile.name}, Students: 4)"
 
 # GROUP 9: Creative Arts & Science (Facilitator3-led)
 group9 = Group.create!(
@@ -409,11 +419,11 @@ group9 = Group.create!(
   created_by: admin.id,
   updated_by: admin.id
 )
-GroupUser.create!(group: group9, user: facilitator3, relation: :facilitator, created_by: admin.id, updated_by: admin.id)
+GroupUser.create!(group: group9, user: facilitator3, relation: :teacher, created_by: admin.id, updated_by: admin.id)
 [ students[27], students[33], students[38], students[39], students[44] ].each do |student|
   GroupUser.create!(group: group9, user: student, relation: :student, created_by: admin.id, updated_by: admin.id)
 end
-puts "  🎭 Group 9: #{group9.name} (Facilitator: #{facilitator3.profile.name}, Students: 5)"
+puts "  🎭 Group 9: #{group9.name} (Teacher: #{facilitator3.profile.name}, Students: 5)"
 
 puts "\n=== Creating Attendance Records ==="
 
@@ -496,7 +506,7 @@ total_attendance = session_count
                         .distinct
 
   instructor = group.users.joins(:group_users)
-                    .where(group_users: { relation: [ 'instructor', 'facilitator' ], group_id: group.id })
+                    .where(group_users: { relation: [ 'teacher' ], group_id: group.id })
                     .first
 
   group_attendance_count = 0
@@ -564,8 +574,7 @@ puts "="*60
 puts "\n📊 DATABASE SUMMARY:"
 puts "  Users:       #{User.count} total"
 puts "    - Admin:         1"
-puts "    - Instructors:   4"
-puts "    - Facilitators:  3"
+puts "    - Teachers:      7"
 puts "    - Students:      45"
 puts "  Schools:     #{School.count}"
 puts "  Groups:      #{Group.count}"
@@ -594,15 +603,3 @@ puts "    → Group 6: #{group6.name} (#{teacher2.profile.name}, 4 students)"
 puts "    → Group 7: #{group7.name} (#{teacher3.profile.name}, 5 students)"
 puts "    → Group 8: #{group8.name} (#{teacher4.profile.name}, 4 students)"
 puts "    → Group 9: #{group9.name} (#{facilitator3.profile.name}, 5 students)"
-
-puts "\n💡 ATTENDANCE PATTERNS:"
-puts "  Always Present:    #{always_present.map { |s| s.profile.name }.join(', ')}"
-puts "  Often Late:        #{often_late.map { |s| s.profile.name }.join(', ')}"
-puts "  Recently Excused:  #{recently_excused.map { |s| s.profile.name }.join(', ')}"
-puts "  Occasional Absent: #{occasional_absent.map { |s| s.profile.name }.join(', ')}"
-puts "\n  ⭐ Group 2 (Physics Lab) has 15 dedicated sessions with full attendance tracking"
-
-puts "\n" + "="*60
-puts "Ready for Attendance UI Testing! 🚀"
-puts "="*60
-puts ""

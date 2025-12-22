@@ -7,12 +7,13 @@
 # - school_users.relation (user's role within a school)
 module Role
   ADMIN = :admin
-  SYSTEM_USER = :system_user
-  INSTRUCTOR = :instructor
-  FACILITATOR = :facilitator
+  SCHOOL_ADMIN = :school_admin
+  TEACHER = :teacher
   STUDENT = :student
+  SYSTEM = :system
+  GUARDIAN = :guardian
 
-  ALL = [ ADMIN, SYSTEM_USER, INSTRUCTOR, FACILITATOR, STUDENT ].freeze
+  ALL = [ ADMIN, SCHOOL_ADMIN, TEACHER, STUDENT, SYSTEM, GUARDIAN ].freeze
 
   def self.valid?(role)
     ALL.include?(role.to_sym)

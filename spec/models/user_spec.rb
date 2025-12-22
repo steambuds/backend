@@ -121,15 +121,15 @@ RSpec.describe User, type: :model do
     end
 
     it "returns roles as symbols" do
-      user.roles = [ :admin, :instructor ]
-      user.save
-      expect(user.roles).to match_array([ :admin, :instructor ])
+      user.roles = [ :admin, :teacher ]
+      expect(user.save).to be true
+      expect(user.roles).to match_array([ :admin, :teacher ])
     end
 
     it "stores roles as strings in database" do
-      user.roles = [ :admin, :instructor ]
-      user.save
-      expect(user.read_attribute(:roles)).to match_array([ "admin", "instructor" ])
+      user.roles = [ :admin, :teacher ]
+      expect(user.save).to be true
+      expect(user.read_attribute(:roles)).to match_array([ "admin", "teacher" ])
     end
   end
 
@@ -146,7 +146,7 @@ RSpec.describe User, type: :model do
     end
 
     it "returns false if the user does not have the role" do
-      expect(user.has_role?(:instructor)).to be false
+      expect(user.has_role?(:teacher)).to be false
     end
   end
 
@@ -154,8 +154,8 @@ RSpec.describe User, type: :model do
     let(:user) { create(:user) }
 
     it "adds a role to the user" do
-      user.add_role(:admin)
-      expect(user.roles).to include(:admin)
+      expect(user.add_role(:teacher)).to be true
+      expect(user.roles).to include(:teacher)
     end
 
     it "does not add duplicate roles" do
@@ -174,18 +174,18 @@ RSpec.describe User, type: :model do
     let(:user) { create(:user) }
 
     before do
-      user.roles = [ :admin, :instructor ]
+      user.roles = [ :admin, :teacher ]
       user.save
     end
 
     it "removes a role from the user" do
       user.remove_role(:admin)
       expect(user.roles).not_to include(:admin)
-      expect(user.roles).to include(:instructor)
+      expect(user.roles).to include(:teacher)
     end
 
     it "returns false if user doesn't have the role" do
-      result = user.remove_role(:facilitator)
+      result = user.remove_role(:guardian)
       expect(result).to be false
     end
   end
@@ -228,7 +228,7 @@ RSpec.describe User, type: :model do
     # Note: Skipped due to PaperTrail + transactional fixtures compatibility issue
     xit "tracks role changes" do
       user = create(:user)
-      user.update!(roles: [ :admin, :instructor ])
+      user.update!(roles: [ :admin, :teacher ])
 
       version = PaperTrail::Version.where(item_type: 'User', item_id: user.id).last
       expect(version.changeset).to include("roles")

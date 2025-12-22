@@ -77,8 +77,8 @@ module Api
     end
 
     def authorize_group_access!
-      # Check if current user is an instructor or facilitator in this group
-      is_teacher = @group.group_users.exists?(user: current_user, relation: [ "instructor", "facilitator" ])
+      # Check if current user is a teacher in this group
+      is_teacher = @group.group_users.exists?(user: current_user, relation: [ "teacher" ])
       render json: { error: "Forbidden" }, status: :forbidden unless is_teacher
     end
   end

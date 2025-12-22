@@ -10,11 +10,12 @@ Creates a new user account.
 
 **Request:**
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{
-  "username": "testuser",
-  "email": "test@example2.com",
-  "password": "Password123"
-}' http://localhost:8000/api/user
+curl -X POST -H "Content-Type: application/json" -d 
+  "{
+    \"username\": \"testuser\",
+    \"email\": \"test@example2.com\",
+    \"password\": \"Password123\"
+  }" http://localhost:8000/api/user
 ```
 
 **Response:**
@@ -36,10 +37,11 @@ Logs in a user and returns a JWT access token and a refresh token.
 
 **Request:**
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{
-  "email": "ghanshyam@steambuds.com",
-  "password": "Password123"
-}' http://localhost:8000/api/login
+curl -X POST -H "Content-Type: application/json" -d 
+  "{
+    \"email\": \"ghanshyam@steambuds.com\",
+    \"password\": \"Password123\"
+  }" http://localhost:8000/api/login
 ```
 
 **Response:**
@@ -60,9 +62,10 @@ Logs out a user by invalidating the refresh token.
 
 **Request:**
 ```bash
-curl -X DELETE -H "Content-Type: application/json" -d '{
-  "refresh_token": "your_refresh_token"
-}' http://localhost:8000/api/logout
+curl -X DELETE -H "Content-Type: application/json" -d 
+  "{
+    \"refresh_token\": \"your_refresh_token\"
+  }" http://localhost:8000/api/logout
 ```
 
 **Response:** `204 No Content`
@@ -77,9 +80,10 @@ Generates a new access token using a valid refresh token.
 
 **Request:**
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{
-  "refresh_token": "your_refresh_token"
-}' http://localhost:8000/api/refresh
+curl -X POST -H "Content-Type: application/json" -d 
+  "{
+    \"refresh_token\": \"your_refresh_token\"
+  }" http://localhost:8000/api/refresh
 ```
 
 **Response:**
@@ -131,13 +135,14 @@ Creates a new "hello" record. **Does not require authentication.**
 
 **Request:**
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{
-  "name": "John Doe",
-  "email": "john.doe@example.com",
-  "description": "This is a test message.",
-  "mobile_number": "+1234567890",
-  "category": "General"
-}' http://localhost:8000/api/hello
+curl -X POST -H "Content-Type: application/json" -d 
+  "{
+    \"name\": \"John Doe\",
+    \"email\": \"john.doe@example.com\",
+    \"description\": \"This is a test message.\",
+    \"mobile_number\": \"+1234567890\",
+    \"category\": \"General\"
+  }" http://localhost:8000/api/hello
 ```
 
 **Note:** Either `email` or `mobile_number` must be provided (or both).
@@ -298,58 +303,60 @@ Creates a new user profile. **Requires JWT authentication. Each user can only ha
 
 **Request (Student Example):**
 ```bash
-curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer your_access_token" -d '{
-  "name": "Arjun Kumar",
-  "steamer_id": 9000001,
-  "father_name": "Rajesh Kumar",
-  "mother_name": "Priya Kumar",
-  "gender": "male",
-  "bio": "A passionate student.",
-  "avatar_url": "http://example.com/avatar.jpg",
-  "alternate_mobile_number": "+1234567890",
-  "address": "123 Main St",
-  "date_of_birth": "2000-01-01",
-  "roll_specific_detail": {
-    "student": {
-      "grade": "10",
-      "section": "A",
-      "roll_number": "10A001",
-      "enrollment_date": "2023-09-01"
-    }
-  },
-  "experience": []
-}' http://localhost:8000/api/profiles
+curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer your_access_token" -d 
+  "{
+    \"name\": \"Arjun Kumar\",
+    \"steamer_id\": 9000001,
+    \"father_name\": \"Rajesh Kumar\",
+    \"mother_name\": \"Priya Kumar\",
+    \"gender\": \"male\",
+    \"bio\": \"A passionate student.\",
+    \"avatar_url\": \"http://example.com/avatar.jpg\",
+    \"alternate_mobile_number\": \"+1234567890\",
+    \"address\": \"123 Main St\",
+    \"date_of_birth\": \"2000-01-01\",
+    \"roll_specific_detail\": {
+      \"student\": {
+        \"grade\": \"10\",
+        \"section\": \"A\",
+        \"roll_number\": \"10A001\",
+        \"enrollment_date\": \"2023-09-01\"
+      }
+    },
+    "experience": []
+  }" http://localhost:8000/api/profiles
 ```
 
 **Request (Teacher Example):**
 ```bash
-curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer your_access_token" -d '{
-  "name": "Priya Sharma",
-  "steamer_id": 9000002,
-  "father_name": "Mohan Sharma",
-  "mother_name": "Lakshmi Sharma",
-  "gender": "female",
-  "bio": "Experienced mathematics teacher.",
-  "avatar_url": "http://example.com/avatar.jpg",
-  "alternate_mobile_number": "+1234567891",
-  "address": "456 Teacher Lane",
-  "date_of_birth": "1985-05-15",
-  "roll_specific_detail": {
-    "teacher": {
-      "years_of_experience": 10,
-      "qualification": "M.Sc. Mathematics",
-      "subjects": ["Mathematics", "Physics"]
-    }
-  },
-  "experience": [
-    {
-      "type": "teaching",
-      "description": "Mathematics teacher at ABC School",
-      "duration": "2015-2020",
-      "organization": "ABC School"
-    }
-  ]
-}' http://localhost:8000/api/profiles
+curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer your_access_token" -d 
+  "{
+    \"name\": \"Priya Sharma\",
+    \"steamer_id\": 9000002,
+    \"father_name\": \"Mohan Sharma\",
+    \"mother_name\": \"Lakshmi Sharma\",
+    \"gender\": \"female\",
+    \"bio\": \"Experienced mathematics teacher.\",
+    \"avatar_url\": \"http://example.com/avatar.jpg\",
+    \"alternate_mobile_number\": \"+1234567891\",
+    \"address\": \"456 Teacher Lane\",
+    \"date_of_birth\": \"1985-05-15\",
+    \"roll_specific_detail\": {
+      \"teacher\": {
+        \"years_of_experience\": 10,
+        \"qualification\": \"M.Sc. Mathematics\",
+        \"subjects\": [\"Mathematics\", \"Physics\"]
+      }
+    },
+    "experience": [
+      {
+        "type": "teaching",
+        "description": "Mathematics teacher at ABC School",
+        "duration": "2015-2020",
+        "organization": "ABC School"
+      }
+    ]
+  }" http://localhost:8000/api/profiles
 ```
 
 **Response:**
@@ -390,10 +397,11 @@ Updates an existing user profile. **Requires JWT authentication. Users can only 
 
 **Request:**
 ```bash
-curl -X PUT -H "Content-Type: application/json" -H "Authorization: Bearer your_access_token" -d '{
-  "bio": "An updated bio for the student.",
-  "address": "456 New Address"
-}' http://localhost:8000/api/profiles/uuid-here
+curl -X PUT -H "Content-Type: application/json" -H "Authorization: Bearer your_access_token" -d 
+  "{
+    \"bio\": \"An updated bio for the student.\",
+    \"address\": \"456 New Address\"
+  }" http://localhost:8000/api/profiles/uuid-here
 ```
 
 **Response:**
@@ -480,7 +488,7 @@ Retrieves a paginated list of all users with their profiles and roles. Supports 
 
 **Query Parameters:**
 - `search` (optional): Fuzzy search on email and phone number
-- `role` (optional): Filter by user role (admin, system_user, instructor, facilitator, student)
+- `role` (optional): Filter by user role (admin, school_admin, teacher, student, system, guardian)
 - `profile_type` (optional): Filter by profile type (teacher, student)
 - `page` (optional): Page number (default: 1)
 - `per_page` (optional): Records per page (default: 20, max: 100)
@@ -518,7 +526,7 @@ curl -X GET -H "Authorization: Bearer your_access_token" \
       "email": "john@example.com",
       "mobile_number": "+1234567890",
       "created_at": "2024-01-15T10:30:00Z",
-      "roles": ["admin", "instructor"],
+      "roles": ["admin", "teacher"],
       "profile": {
         "name": "John Doe",
         "bio": "Experienced mathematics teacher"
@@ -620,7 +628,7 @@ curl -X POST -H "Content-Type: application/json" \
 **Error Response (Invalid Role):**
 ```json
 {
-  "error": "Invalid role. Valid roles are: admin, system_user, instructor, facilitator, student"
+  "error": "Invalid role. Valid roles are: admin, school_admin, teacher, student, system, guardian"
 }
 ```
 
@@ -703,7 +711,7 @@ curl -X PUT -H "Content-Type: application/json" \
 ```json
 {
   "error": "Invalid roles: invalid_role, another_invalid",
-  "valid_roles": ["admin", "system_user", "instructor", "facilitator", "student"]
+  "valid_roles": ["admin", "school_admin", "teacher", "student", "system", "guardian"]
 }
 ```
 
@@ -713,17 +721,18 @@ curl -X PUT -H "Content-Type: application/json" \
 
 ### List Teacher's Groups
 
-Retrieves a list of groups where the current user is an instructor or facilitator. **Requires JWT authentication.**
+Retrieves a list of groups where the current user is a teacher. **Requires JWT authentication.**
 
 **Endpoint:** `GET /api/groups`
 
 **Request:**
 ```bash
 # Login as a teacher first
-curl -X POST -H "Content-Type: application/json" -d '{
-  "email": "priya.sharma@steambuds.com",
-  "password": "Password123"
-}' http://localhost:8000/api/login
+curl -X POST -H "Content-Type: application/json" -d 
+  "{
+    \"email\": \"priya.sharma@steambuds.com\",
+    \"password\": \"Password123\"
+  }" http://localhost:8000/api/login
 
 # Use the returned token to get groups
 curl -H "Authorization: Bearer your_access_token" \
@@ -755,7 +764,7 @@ curl -H "Authorization: Bearer your_access_token" \
 ```
 
 **Notes:**
-- Only returns groups where the authenticated user is assigned as an instructor or facilitator
+- Only returns groups where the authenticated user is assigned as a teacher
 - Teachers see different groups based on their assignments
 - Empty array `[]` returned if user has no group assignments
 
@@ -768,7 +777,7 @@ Retrieves comprehensive attendance data for a specific group, including:
 - Aggregate attendance statistics (present/absent/late/excused counts)
 - Calendar view with daily attendance status
 
-**Requires JWT authentication and user must be an instructor or facilitator of the group.**
+**Requires JWT authentication and user must be a teacher of the group.**
 
 **Endpoint:** `GET /api/groups/:group_id/attendances`
 
@@ -847,7 +856,7 @@ curl -H "Authorization: Bearer your_access_token" \
 
 Submits attendance records for multiple students in a group for a specific date. This endpoint supports bulk submission, allowing teachers to mark attendance for an entire class at once.
 
-**Requires JWT authentication and user must be an instructor or facilitator of the group.**
+**Requires JWT authentication and user must be a teacher of the group.**
 
 **Endpoint:** `POST /api/groups/:group_id/attendances`
 
@@ -855,16 +864,17 @@ Submits attendance records for multiple students in a group for a specific date.
 ```bash
 curl -X POST -H "Content-Type: application/json" \
   -H "Authorization: Bearer your_access_token" \
-  -d '{
-  "date": "2025-12-10T09:00:00Z",
-  "attendances": [
-    { "user_id": "student-uuid-1", "status": "present" },
-    { "user_id": "student-uuid-2", "status": "present" },
-    { "user_id": "student-uuid-3", "status": "late" },
-    { "user_id": "student-uuid-4", "status": "absent" },
-    { "user_id": "student-uuid-5", "status": "excused" }
+  -d 
+  "{
+  \"date\": \"2025-12-10T09:00:00Z\",
+  \"attendances\": [
+    { \"user_id\": \"student-uuid-1\", \"status\": \"present\" },
+    { \"user_id\": \"student-uuid-2\", \"status\": \"present\" },
+    { \"user_id\": \"student-uuid-3\", \"status\": \"late\" },
+    { \"user_id\": \"student-uuid-4\", \"status\": \"absent\" },
+    { \"user_id\": \"student-uuid-5\", \"status\": \"excused\" }
   ]
-}' http://localhost:8000/api/groups/group_uuid/attendances
+}" http://localhost:8000/api/groups/group_uuid/attendances
 ```
 
 **Request Fields:**
@@ -893,11 +903,11 @@ curl -X POST -H "Content-Type: application/json" \
 }
 ```
 
-**Response (Unauthorized - not a group instructor/facilitator):**
+**Response (Unauthorized - not a group teacher):**
 ```json
 {
   "error": "Forbidden",
-  "message": "You must be an instructor or facilitator of this group"
+  "message": "You must be a teacher of this group"
 }
 ```
 
@@ -912,31 +922,31 @@ curl -X POST -H "Content-Type: application/json" \
 
 ```bash
 # 1. Teacher logs in
-TOKEN=$(curl -s -X POST -H "Content-Type: application/json" \
-  -d '{"email": "priya.sharma@steambuds.com", "password": "Password123"}' \
+TOKEN=$(curl -s -X POST -H "Content-Type: application/json" 
+  -d '{"email": "priya.sharma@steambuds.com", "password": "Password123"}' 
   http://localhost:8000/api/login | jq -r '.token')
 
 # 2. Get list of teacher's groups
-GROUPS=$(curl -s -H "Authorization: Bearer $TOKEN" \
+GROUPS=$(curl -s -H "Authorization: Bearer $TOKEN" 
   http://localhost:8000/api/groups)
 
 # 3. Get group ID (first group)
 GROUP_ID=$(echo $GROUPS | jq -r '.[0].id')
 
 # 4. Get current attendance dashboard (to see students)
-curl -s -H "Authorization: Bearer $TOKEN" \
+curl -s -H "Authorization: Bearer $TOKEN" 
   http://localhost:8000/api/groups/$GROUP_ID/attendances | jq
 
 # 5. Mark today's attendance
-curl -X POST -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
+curl -X POST -H "Content-Type: application/json" 
+  -H "Authorization: Bearer $TOKEN" 
   -d "{
     \"date\": \"$(date -u +%Y-%m-%dT09:00:00Z)\",
     \"attendances\": [
       {\"user_id\": \"student-1-uuid\", \"status\": \"present\"},
       {\"user_id\": \"student-2-uuid\", \"status\": \"present\"}
     ]
-  }" \
+  }" 
   http://localhost:8000/api/groups/$GROUP_ID/attendances
 ```
 
@@ -952,10 +962,11 @@ curl -X POST -H "Content-Type: application/json" \
 
 ### Available Roles
 - **admin** - Administrator role with full access to all protected endpoints
-- **system_user** - System/automated process role
-- **instructor** - Teacher role for leading groups and marking attendance
-- **facilitator** - Community facilitator role for supporting groups
+- **school_admin** - School administrator role
+- **teacher** - Teacher role for leading groups and marking attendance
 - **student** - Student role for group membership and attendance tracking
+- **system** - System/automated process role
+- **guardian** - Guardian role for students
 
 ### Endpoint Access Summary
 
@@ -978,6 +989,6 @@ curl -X POST -H "Content-Type: application/json" \
 | POST /api/users/:id/roles | Yes | admin |
 | DELETE /api/users/:id/roles/:role | Yes | admin |
 | PUT /api/users/:id/roles | Yes | admin |
-| GET /api/groups | Yes | None (Instructor/Facilitator) |
-| GET /api/groups/:group_id/attendances | Yes | None (Instructor/Facilitator of group) |
-| POST /api/groups/:group_id/attendances | Yes | None (Instructor/Facilitator of group) |
+| GET /api/groups | Yes | None (Teacher) |
+| GET /api/groups/:group_id/attendances | Yes | None (Teacher of group) |
+| POST /api/groups/:group_id/attendances | Yes | None (Teacher of group) |

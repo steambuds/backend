@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe Authorizable, type: :controller do
   controller(ApplicationController) do
     before_action -> { authorize_role!(:admin) }, only: [ :admin_only_action ]
-    before_action -> { authorize_role!(:admin, :instructor) }, only: [ :multi_role_action ]
+    before_action -> { authorize_role!(:admin, :teacher) }, only: [ :multi_role_action ]
 
     def test_action
       render json: { message: "Success" }
@@ -28,7 +28,7 @@ RSpec.describe Authorizable, type: :controller do
 
   let(:user) { User.create!(username: "testuser", email: "test@example.com", password: "Password123") }
   let(:admin_user) { User.create!(username: "adminuser", email: "admin@example.com", password: "Password123", roles: [ :admin ]) }
-  let(:instructor_user) { User.create!(username: "instructoruser", email: "instructor@example.com", password: "Password123", roles: [ :instructor ]) }
+  let(:teacher_user) { User.create!(username: "teacheruser", email: "teacher@example.com", password: "Password123", roles: [ :teacher ]) }
 
   describe "#authorize_role!" do
     context "when user is not authenticated" do
@@ -73,8 +73,8 @@ RSpec.describe Authorizable, type: :controller do
         expect(JSON.parse(response.body)["message"]).to eq("Multi-role access granted")
       end
 
-      it "allows access if user has instructor role" do
-        allow(controller).to receive(:current_user).and_return(instructor_user)
+      it "allows access if user has teacher role" do
+        allow(controller).to receive(:current_user).and_return(teacher_user)
         get :multi_role_action
         expect(response).to have_http_status(:ok)
         expect(JSON.parse(response.body)["message"]).to eq("Multi-role access granted")

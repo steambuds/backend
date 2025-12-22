@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "Api::Groups", type: :request do
-  let(:user) { create(:user, roles: [ :instructor, :facilitator ]) }
+  let(:user) { create(:user, roles: [ :teacher ]) }
   let(:headers) { { 'Authorization' => "Bearer #{token}" } }
   let(:token) { JsonWebToken.encode(user_id: user.id) }
 
@@ -12,10 +12,10 @@ RSpec.describe "Api::Groups", type: :request do
       let!(:group3) { create(:group) }
 
       before do
-        # user is instructor in group1
-        create(:group_user, :instructor, user: user, group: group1)
-        # user is facilitator in group2
-        create(:group_user, :facilitator, user: user, group: group2)
+        # user is teacher in group1
+        create(:group_user, :teacher, user: user, group: group1)
+        # user is teacher in group2
+        create(:group_user, :teacher, user: user, group: group2)
         # user is not in group3
       end
 

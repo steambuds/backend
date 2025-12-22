@@ -4,14 +4,14 @@ FactoryBot.define do
     association :user
     relation { "student" }
 
-    trait :instructor do
-      relation { "instructor" }
-      association :user, factory: [ :user, :instructor ]
+    trait :teacher do
+      relation { "teacher" }
+      association :user, factory: [ :user, :teacher ]
     end
 
-    trait :facilitator do
-      relation { "facilitator" }
-      association :user, factory: [ :user, :facilitator ]
+    trait :guardian do
+      relation { "guardian" }
+      association :user, factory: [ :user, :guardian ]
     end
 
     trait :student do
