@@ -12,8 +12,9 @@ module Role
   STUDENT = :student
   SYSTEM = :system
   GUARDIAN = :guardian
+  OTHER = :other
 
-  ALL = [ ADMIN, SCHOOL_ADMIN, TEACHER, STUDENT, SYSTEM, GUARDIAN ].freeze
+  ALL = [ ADMIN, SCHOOL_ADMIN, TEACHER, STUDENT, SYSTEM, GUARDIAN, OTHER ].freeze
 
   def self.valid?(role)
     ALL.include?(role.to_sym)

@@ -25,6 +25,10 @@ FactoryBot.define do
       roles { [ :guardian ] }
     end
 
+    trait :other do
+      roles { [ :other ] }
+    end
+
     trait :student do
       roles { [ :student ] }
     end

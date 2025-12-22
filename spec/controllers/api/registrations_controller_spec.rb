@@ -70,13 +70,9 @@ RSpec.describe 'POST /api/user', type: :request do
       let(:no_role_attributes) { valid_attributes.except(:role) }
       before { post '/api/user', params: no_role_attributes }
 
-      it 'creates a user with an empty roles array' do
-        expect(User.count).to eq(1)
-        expect(User.first.roles).to be_empty
-      end
-
-      it 'returns a created status' do
-        expect(response).to have_http_status(:created)
+      it 'raise error and do not create a user with a nil role' do
+        expect(User.count).to eq(0)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end
@@ -97,7 +93,7 @@ RSpec.describe 'POST /api/user', type: :request do
 
     it 'returns an error message' do
       json_response = JSON.parse(response.body)
-      expect(json_response['errors']).to include("Role 'admin' is not allowed for registration. Allowed roles: student, teacher, guardian")
+      expect(json_response['errors']).to include("Role 'admin' is not allowed for registration. Allowed roles: student, teacher, guardian, other")
     end
   end
 

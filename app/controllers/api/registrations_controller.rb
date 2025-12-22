@@ -2,11 +2,11 @@ module Api
   class RegistrationsController < ApplicationController
     def create
       # Allowed roles for public registration
-      allowed_roles = %w[student teacher guardian]
+      allowed_roles = %w[student teacher guardian other]
 
       # 1. Validate role inclusion if present
       role = params[:role]
-      if role.present? && !allowed_roles.include?(role)
+      if !role.is_a?(Array) && !allowed_roles.include?(role)
         return render json: {
           errors: [ "Role '#{role}' is not allowed for registration. Allowed roles: #{allowed_roles.join(', ')}" ]
         }, status: :unprocessable_content
@@ -15,16 +15,17 @@ module Api
       ActiveRecord::Base.transaction do
         # 2. Create User
         user = User.new(user_params)
+
+        # 3. Assign Role if provided
+        if role.present?
+          user.add_role(role)
+        end
+        
         unless user.save
           render json: { errors: user.errors.full_messages }, status: :unprocessable_content
           raise ActiveRecord::Rollback
         end
 
-        # 3. Assign Role if provided
-        if role.present?
-          user.add_role(role)
-          user.save! # Persist role change
-        end
 
         # 4. Create Profile
         profile = Profile.new(profile_params)
