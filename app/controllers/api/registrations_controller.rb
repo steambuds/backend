@@ -20,7 +20,7 @@ module Api
         if role.present?
           user.add_role(role)
         end
-        
+
         unless user.save
           render json: { errors: user.errors.full_messages }, status: :unprocessable_content
           raise ActiveRecord::Rollback
