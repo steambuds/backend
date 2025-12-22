@@ -8,7 +8,7 @@ module Api
       role = params[:role]
       if role.present? && !allowed_roles.include?(role)
         return render json: {
-          errors: ["Role '#{role}' is not allowed for registration. Allowed roles: #{allowed_roles.join(', ')}"]
+          errors: [ "Role '#{role}' is not allowed for registration. Allowed roles: #{allowed_roles.join(', ')}" ]
         }, status: :unprocessable_content
       end
 
