@@ -20,6 +20,9 @@ Rails.application.routes.draw do
       resources :attendances, only: [ :index, :create ]
     end
 
+    # Daily visit tracking
+    post "track_visit", to: "daily_visits#track"
+
     # User management routes
     resources :users, only: [ :index, :show ] do
       member do

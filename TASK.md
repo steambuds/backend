@@ -1,6 +1,7 @@
 # Tasks
 
 ## Active Tasks
+- **STEAM-15**: Refactor User and Profile Schema (Status: pending)
 
 ## Completed Tasks
 - **STEAM-9**: User Management Dashboard API (Completed: 2025-12-09)
@@ -8,7 +9,59 @@
 - **STEAM-11**: Attendance Dashboard API Endpoints (Completed: 2025-12-10)
 - **STEAM-12**: Update Role Enum and Renaming (Completed: 2025-12-22)
 - **STEAM-13**: Enhanced User Registration with Profile (Completed: 2025-12-22)
+- **STEAM-14**: Daily Visit Tracking Endpoint (Completed: 2025-12-22)
 
+## Task: STEAM-15 - Refactor User and Profile Schema
+
+**ID:** STEAM-15
+**Title:** Refactor User and Profile Schema
+**Status:** pending
+**Created:** 2025-12-22
+
+### Description
+This task involves several schema and logic changes:
+1.  **User Schema:** Make the `username` column unique but nullable.
+2.  **Profile Schema:**
+    - Change the `address` column from `text` to `jsonb` to store structured address data (address_1, address_2, district, state, country, pin).
+    - Remove the `steamer_id` column.
+3.  **Registration Controller:** Update `Api::RegistrationsController` to remove `steamer_id` generation and handle the new structured `address` format.
+
+### Context
+- This refactoring simplifies the user and profile models and aligns them with more structured data practices.
+- `steamer_id` is being removed, simplifying profile creation.
+- `username` is now optional.
+
+### Steps
+1. [ ] **Migration 1 (Users):** Create a migration to make `username` nullable in the `users` table.
+2. [ ] **Migration 2 (Profiles)::** Create a migration to change `address` to `jsonb` and remove `steamer_id` from the `profiles` table.
+3. [ ] **Model Updates:** Update `User` and `Profile` models and their specs to reflect schema changes.
+4. [ ] **Controller Spec Update:** Update `spec/controllers/api/registrations_controller_spec.rb` for nullable username, new address format, and removal of `steamer_id`.
+5. [ ] **Controller Update:** Update `Api::RegistrationsController` to align with the new schema and registration flow.
+6. [ ] **Verification:** Run all tests to ensure no regressions.
+7. [ ] **Documentation:** Update relevant documentation (`AGENT.md`, `routes_documentation.md`).
+
+## Task: STEAM-14 - Daily Visit Tracking Endpoint
+
+**ID:** STEAM-14
+**Title:** Daily Visit Tracking Endpoint
+**Status:** completed
+**Created:** 2025-12-22
+**Completed:** 2025-12-22
+
+### Description
+Create an API endpoint to track daily website visits. The endpoint should record the date and increment a visit count. If a record for the current day exists, it should increment the count; otherwise, it should create a new record with a count of 1.
+
+### Context
+- **Requirement:** Track daily engagement on the website.
+- **Data Structure:** Need a simple table `daily_visits` with `visit_date` (date) and `count` (integer).
+- **Behavior:** Upsert logic (create or increment).
+
+### Steps
+1. [x] **Migration:** Create `daily_visits` table with `visit_date` (unique index) and `count` (default 0).
+2. [x] **Model Spec (TDD):** Create `spec/models/daily_visit_spec.rb` to test validations and increment logic.
+3. [x] **Model:** Create `app/models/daily_visit.rb`.
+4. [x] **Controller Spec (TDD):** Create `spec/requests/api/daily_visits_spec.rb` to test the tracking endpoint.
+5. [x] **Controller & Routes:** Implement `Api::DailyVisitsController#track` and add route `POST /api/track_visit` (or similar).
 
 ## Task: STEAM-13 - Enhanced User Registration with Profile
 

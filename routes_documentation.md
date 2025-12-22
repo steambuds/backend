@@ -224,6 +224,31 @@ curl -X DELETE -H "Authorization: Bearer your_access_token" \
 
 ---
 
+## Daily Visit Tracking
+
+### Track a Website Visit
+
+Records a visit for the current day, incrementing the counter. This is a public endpoint.
+
+**Endpoint:** `POST /api/track_visit`
+
+**Request:**
+```bash
+curl -X POST http://localhost:8000/api/track_visit
+```
+
+**Response (Success):**
+```json
+{
+  "status": "success",
+  "visit_date": "2025-12-22",
+  "count": 1
+}
+```
+*`count` will be higher for subsequent requests on the same day.*
+
+---
+
 ## Profile Routes
 
 ### Get All Profiles
@@ -994,6 +1019,7 @@ curl -X POST -H "Content-Type: application/json"
 | POST /api/refresh | No | None |
 | DELETE /api/logout | No | None |
 | POST /api/hello | No | None |
+| POST /api/track_visit | No | None |
 | GET /api/hello | Yes | admin |
 | DELETE /api/hello/:id | Yes | admin |
 | GET /api/profiles | Yes | admin |

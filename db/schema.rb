@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_10_100712) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_22_081054) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -26,6 +26,14 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_100712) do
     t.index ["attendance_at"], name: "index_attendances_on_attendance_at"
     t.index ["group_id"], name: "index_attendances_on_group_id"
     t.index ["user_id"], name: "index_attendances_on_user_id"
+  end
+
+  create_table "daily_visits", force: :cascade do |t|
+    t.integer "count"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.date "visit_date"
+    t.index ["visit_date"], name: "index_daily_visits_on_visit_date", unique: true
   end
 
   create_table "group_users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
