@@ -7,7 +7,30 @@
 - **STEAM-10**: Database Schema Migration Updates (Status: 2025-12-08)
 - **STEAM-11**: Attendance Dashboard API Endpoints (Completed: 2025-12-10)
 - **STEAM-12**: Update Role Enum and Renaming (Completed: 2025-12-22)
+- **STEAM-13**: Enhanced User Registration with Profile (Completed: 2025-12-22)
 
+
+## Task: STEAM-13 - Enhanced User Registration with Profile
+
+**ID:** STEAM-13
+**Title:** Enhanced User Registration with Profile
+**Status:** completed
+**Created:** 2025-12-22
+**Completed:** 2025-12-22
+
+### Description
+Update `Api::RegistrationsController` to support creating a full user profile during registration. The API should accept `username`, `email`, `password`, `mobile_number`, `role`, `name`, `gender`, `address`, and `date_of_birth`. It must validate that the role is one of `student`, `teacher`, or `guardian`. Both the `User` and `Profile` records should be created in a single transaction.
+
+### Context
+- **Current State:** Registration only creates a `User` with username, email, and password.
+- **Requirement:** Need to capture profile data upfront and assign roles.
+- **Roles:** Restricted to `student`, `teacher`, `guardian`. `admin`, `school_admin`, `system` are not allowed via public registration.
+
+### Steps
+1. [x] **Update Spec (Red):** Modify `spec/controllers/api/registrations_controller_spec.rb` to test for new fields, role validation, and profile creation.
+2. [x] **Implement Controller:** Update `Api::RegistrationsController#create` to permit new params, validate roles, and create `User` + `Profile` in a transaction.
+3. [x] **Verify (Green):** Run tests to ensure pass.
+4. [x] **Documentation:** Update `routes_documentation.md` with the new registration payload.
 
 ## Task: STEAM-12 - Update Role Enum and Renaming
 

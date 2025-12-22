@@ -4,26 +4,43 @@
 
 ### User Registration
 
-Creates a new user account.
+Creates a new user account with profile and role.
 
 **Endpoint:** `POST /api/user`
 
 **Request:**
 ```bash
-curl -X POST -H "Content-Type: application/json" -d 
-  "{
-    \"username\": \"testuser\",
-    \"email\": \"test@example2.com\",
-    \"password\": \"Password123\"
-  }" http://localhost:8000/api/user
+curl -X POST -H "Content-Type: application/json" -d '{
+  "username": "testuser",
+  "email": "test@example2.com",
+  "password": "Password123",
+  "mobile_number": "+1234567890",
+  "role": "student",
+  "name": "Test User",
+  "gender": "male",
+  "address": "123 Test Lane",
+  "date_of_birth": "2000-01-01"
+}' http://localhost:8000/api/user
 ```
+
+**Allowed Roles:** `student`, `teacher`, `guardian`
 
 **Response:**
 ```json
 {
   "id": "uuid",
   "username": "testuser",
-  "email": "test@example2.com"
+  "email": "test@example2.com",
+  "roles": ["student"],
+  "profile": {
+    "id": "uuid",
+    "steamer_id": 9000001,
+    "name": "Test User",
+    "gender": "male",
+    "address": "123 Test Lane",
+    "date_of_birth": "2000-01-01",
+    ...
+  }
 }
 ```
 
