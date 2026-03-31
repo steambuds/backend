@@ -44,6 +44,70 @@ def create_user(username, roles = [], profile_data = {})
   user
 end
 
+puts "\n=== Creating Role-Based Development Users ==="
+puts "  " + "-"*58
+
+# Simple role-based users for development/testing (password format: Role@1234)
+dev_admin = User.create!(
+  username: "admin",
+  email: "admin@steambuds.com",
+  password: "Admin@1234",
+  mobile_number: "+919000000001",
+  roles: [ :admin ]
+)
+Profile.create!(id: dev_admin.id, name: "Admin User", steamer_id: 9000001, bio: "Development Admin Account", gender: "male")
+puts "  ✓ admin@steambuds.com (password: Admin@1234)"
+
+dev_school_admin = User.create!(
+  username: "schooladmin",
+  email: "schooladmin@steambuds.com",
+  password: "School@1234",
+  mobile_number: "+919000000002",
+  roles: [ :school_admin ]
+)
+Profile.create!(id: dev_school_admin.id, name: "School Admin", steamer_id: 9000002, bio: "Development School Admin Account", gender: "female")
+puts "  ✓ schooladmin@steambuds.com (password: School@1234)"
+
+dev_teacher = User.create!(
+  username: "teacher",
+  email: "teacher@steambuds.com",
+  password: "Teacher@1234",
+  mobile_number: "+919000000003",
+  roles: [ :teacher ]
+)
+Profile.create!(id: dev_teacher.id, name: "Teacher User", steamer_id: 9000003, bio: "Development Teacher Account", gender: "male")
+puts "  ✓ teacher@steambuds.com (password: Teacher@1234)"
+
+dev_student = User.create!(
+  username: "student",
+  email: "student@steambuds.com",
+  password: "Student@1234",
+  mobile_number: "+919000000004",
+  roles: [ :student ]
+)
+Profile.create!(id: dev_student.id, name: "Student User", steamer_id: 9000004, bio: "Development Student Account", gender: "female", date_of_birth: Date.new(2010, 1, 1))
+puts "  ✓ student@steambuds.com (password: Student@1234)"
+
+dev_guardian = User.create!(
+  username: "guardian",
+  email: "guardian@steambuds.com",
+  password: "Guardian@1234",
+  mobile_number: "+919000000005",
+  roles: [ :guardian ]
+)
+Profile.create!(id: dev_guardian.id, name: "Guardian User", steamer_id: 9000005, bio: "Development Guardian Account", gender: "male")
+puts "  ✓ guardian@steambuds.com (password: Guardian@1234)"
+
+dev_system = User.create!(
+  username: "system",
+  email: "system@steambuds.com",
+  password: "System@1234",
+  mobile_number: "+919000000006",
+  roles: [ :system ]
+)
+Profile.create!(id: dev_system.id, name: "System User", steamer_id: 9000006, bio: "Development System Account", gender: "male")
+puts "  ✓ system@steambuds.com (password: System@1234)"
+
 puts "\n=== Creating 50 Users ==="
 puts "  " + "-"*58
 
@@ -573,6 +637,7 @@ puts "="*60
 
 puts "\n📊 DATABASE SUMMARY:"
 puts "  Users:       #{User.count} total"
+puts "    - Dev Accounts:  6 (simple role-based)"
 puts "    - Admin:         1"
 puts "    - Teachers:      7"
 puts "    - Students:      45"
@@ -580,7 +645,17 @@ puts "  Schools:     #{School.count}"
 puts "  Groups:      #{Group.count}"
 puts "  Attendance:  #{Attendance.count} records"
 
-puts "\n🔑 LOGIN CREDENTIALS (Password: Password123):"
+puts "\n🔑 DEVELOPMENT LOGIN CREDENTIALS:"
+puts "\n  Simple Role-Based Accounts (Format: Role@1234):"
+puts "  ─────────────────────────────────────────────────"
+puts "  Admin:         admin@steambuds.com       (Password: Admin@1234)"
+puts "  School Admin:  schooladmin@steambuds.com (Password: School@1234)"
+puts "  Teacher:       teacher@steambuds.com     (Password: Teacher@1234)"
+puts "  Student:       student@steambuds.com     (Password: Student@1234)"
+puts "  Guardian:      guardian@steambuds.com    (Password: Guardian@1234)"
+puts "  System:        system@steambuds.com      (Password: System@1234)"
+puts "\n  Detailed User Accounts (Password: Password123):"
+puts "  ─────────────────────────────────────────────────"
 puts "  Admin:         #{admin.email}"
 puts "  Teacher 1:     #{teacher1.email} (manages 5 groups)"
 puts "  Teacher 2:     #{teacher2.email}"

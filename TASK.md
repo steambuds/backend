@@ -2,6 +2,187 @@
 
 ## Active Tasks
 
+### Task: STEAM-17 - Google OAuth Authentication
+**ID:** STEAM-17
+**Title:** Google OAuth Authentication
+**Status:** pending
+**Created:** 2025-12-28
+
+#### Description
+Add Google OAuth authentication as a hybrid system alongside existing password-based authentication. Users can sign up and log in using "Sign in with Google" as an alternative to username/password. OAuth users will be assigned the `:other` role by default.
+
+#### Requirements
+- **Hybrid Auth**: Support both Google OAuth and password authentication
+- **Account Protection**: Reject Google sign-in if email already exists with password (409 Conflict error)
+- **Web Redirect Flow**: Authorization code flow for web frontend
+- **Default Role**: Assign `:other` role to new OAuth users automatically
+- **Token Response**: Return JWT access token + refresh token (same format as password login)
+
+#### Context
+- Current authentication: JWT-based with BCrypt password encryption, 24-hour access tokens, 30-day refresh tokens
+- User model uses custom password validation (not `has_secure_password`)
+- Registration creates User + Profile in transaction with composite PK (profile.id = user.id)
+- OAuth users won't have passwords - need conditional validation
+- Business rule: If email exists with password auth, reject OAuth sign-in and force password login
+
+#### Steps
+
+**1. Database Migration**
+- [ ] Create migration `db/migrate/[timestamp]_add_oauth_fields_to_users.rb`
+- [ ] Add `provider` column (string, nullable) - stores "google" or nil
+- [ ] Add `uid` column (string, nullable) - stores Google's unique user ID
+- [ ] Add composite unique index on `[provider, uid]`
+- [ ] Run migration: `rails db:migrate`
+
+**2. Install Required Gems**
+- [ ] Add to Gemfile after line 56: `gem "omniauth-google-oauth2"`, `gem "omniauth-rails_csrf_protection"`
+- [ ] Run `bundle install`
+
+**3. Update User Model Validations**
+- [ ] Update password validation (lines 11-14) to be conditional: `if: :password_required?`
+- [ ] Add OAuth validations: provider must be "google" if present, uid required if provider present, uid unique scoped to provider
+- [ ] Add helper method `password_required?` (returns `provider.blank?`)
+- [ ] Add class method `self.from_omniauth(auth_hash)` to find user by provider/uid
+
+**4. Configure OmniAuth Strategy**
+- [ ] Create `config/initializers/omniauth.rb` with Google OAuth2 strategy configuration
+- [ ] Configure scope: 'email,profile', prompt: 'select_account', access_type: 'online'
+- [ ] Use credentials from `Rails.application.credentials.dig(:google, :client_id)` or ENV vars
+- [ ] Set up Google Cloud Console project and OAuth 2.0 credentials
+- [ ] Add credentials to Rails credentials: `rails credentials:edit` (google.client_id, google.client_secret)
+- [ ] Configure redirect URIs in Google Console: http://localhost:3000/api/auth/google/callback (dev), https://yourdomain.com/api/auth/google/callback (prod)
+
+**5. Add OAuth Routes**
+- [ ] Add to `config/routes.rb` after line 16:
+  - `get "auth/:provider/callback", to: "omniauth_callbacks#create"`
+  - `get "auth/:provider", to: "omniauth_callbacks#passthrough"`
+  - `post "auth/:provider/callback", to: "omniauth_callbacks#create"`
+  - `get "auth/failure", to: "omniauth_callbacks#failure"`
+
+**6. Create OmniAuth Callbacks Controller**
+- [ ] Create `app/controllers/api/omniauth_callbacks_controller.rb`
+- [ ] Implement `passthrough` action (OmniAuth handles redirect)
+- [ ] Implement `create` action:
+  - Extract email, uid, provider, name from `request.env['omniauth.auth']`
+  - Check if email exists with `provider: nil` (password user) → reject with 409 Conflict
+  - Check if OAuth user exists via `User.from_omniauth` → login existing user
+  - Create new user with provider/uid/email, assign `:other` role
+  - Create profile with name from Google (or email prefix as fallback)
+  - Use transaction for atomic user + profile creation
+  - Generate JWT access token + refresh token
+  - Return JSON: `{token, refresh_token, user: {id, email, roles}}`
+- [ ] Implement `failure` action for OAuth errors (401 Unauthorized)
+
+**7. Update Test Factories**
+- [ ] Add `:google_oauth` trait to `spec/factories/user_factory.rb`:
+  - provider: "google"
+  - uid: random 21-char alphanumeric
+  - password: nil
+  - encrypted_password: nil
+
+**8. Configure OmniAuth Test Mode**
+- [ ] Add to `spec/rails_helper.rb`:
+  - `OmniAuth.config.test_mode = true`
+  - Mock Google OAuth response with provider, uid, email, name
+
+**9. Create Request Specs for OAuth**
+- [ ] Create `spec/requests/api/omniauth_callbacks_spec.rb`
+- [ ] Test case: New user via Google OAuth
+  - Creates user with provider/uid
+  - Creates profile with name from Google
+  - Assigns `:other` role by default
+  - Returns JWT + refresh tokens
+  - encrypted_password is nil
+- [ ] Test case: Existing OAuth user login
+  - Finds existing user by provider/uid
+  - Returns tokens without creating duplicate
+  - User count unchanged
+- [ ] Test case: Email exists as password user (rejection)
+  - Returns 409 Conflict status
+  - Error message: "account with this email already exists"
+  - Does not create new user
+  - Instructs user to sign in with password
+- [ ] Test case: OAuth failure
+  - Returns 401 Unauthorized
+  - Handles invalid credentials
+
+**10. Add Model Specs for OAuth Validations**
+- [ ] Update `spec/models/user_spec.rb` with OAuth tests:
+  - OAuth users don't require password
+  - Provider must be "google" if present
+  - uid required when provider present
+  - uid unique scoped to provider
+  - `User.from_omniauth` finds user by provider/uid
+
+**11. Final Verification**
+- [ ] Run full test suite: `bundle exec rspec`
+- [ ] Run linter: `bundle exec rubocop -a`
+- [ ] Test OAuth flow manually:
+  - New user signup via Google (creates user + profile with `:other` role)
+  - Existing OAuth user login (returns tokens, no duplicate)
+  - Duplicate email rejection (password user exists, OAuth rejected)
+- [ ] Verify JWT tokens contain correct user_id
+- [ ] Verify refresh tokens are created and stored
+- [ ] Check PaperTrail audit logs for OAuth user creation
+- [ ] Update AGENT.md with OAuth authentication documentation
+
+#### Files to Create (4)
+- `db/migrate/[timestamp]_add_oauth_fields_to_users.rb` - Migration for provider/uid
+- `config/initializers/omniauth.rb` - OmniAuth Google OAuth2 configuration
+- `app/controllers/api/omniauth_callbacks_controller.rb` - OAuth callback handler
+- `spec/requests/api/omniauth_callbacks_spec.rb` - Request specs for OAuth flow
+
+#### Files to Modify (6)
+- `Gemfile` - Add omniauth-google-oauth2, omniauth-rails_csrf_protection
+- `app/models/user.rb` - Conditional password validation, OAuth validations, from_omniauth method
+- `config/routes.rb` - Add OAuth routes
+- `spec/factories/user_factory.rb` - Add :google_oauth trait
+- `spec/rails_helper.rb` - Configure OmniAuth test mode
+- `spec/models/user_spec.rb` - Add OAuth validation tests
+
+#### Key Implementation Details
+
+**User Model Validation Logic:**
+```ruby
+validates :password, ..., if: :password_required?
+validates :provider, inclusion: { in: %w[google] }, allow_nil: true
+validates :uid, presence: true, if: -> { provider.present? }
+
+def password_required?
+  provider.blank? # Password required only for non-OAuth users
+end
+
+def self.from_omniauth(auth_hash)
+  find_by(provider: auth_hash.provider, uid: auth_hash.uid)
+end
+```
+
+**Business Logic (OmniAuth Callback):**
+1. Extract email, uid, provider from OAuth response
+2. Check: `User.find_by(email: email, provider: nil)` → if exists, reject (409)
+3. Check: `User.from_omniauth(auth_hash)` → if exists, login
+4. Create new user: email, provider, uid, roles: [:other]
+5. Create profile: id = user.id, name from Google
+6. Return JWT + refresh token
+
+**OAuth Routes:**
+- `GET /api/auth/google` - Initiates OAuth flow (redirects to Google)
+- `GET /api/auth/google/callback` - Handles callback from Google
+- `POST /api/auth/google/callback` - Alternative callback method
+- `GET /api/auth/failure` - Handles OAuth errors
+
+**Frontend Integration:**
+```javascript
+// Redirect to backend OAuth endpoint
+window.location.href = 'http://localhost:3000/api/auth/google';
+```
+
+#### Trade-offs & Decisions
+- **Account Protection**: Reject OAuth if email exists as password user (prevents account takeover, simpler than account linking)
+- **Profile Data**: OAuth users get minimal profile (name only) - may need completion flow in frontend
+- **Default Role**: `:other` role assigned automatically - can be changed by admin later
+- **Future Enhancements**: Account linking (let password users add Google), multiple providers (Facebook, Apple)
+
 ## Completed Tasks
 - **STEAM-9**: User Management Dashboard API (Completed: 2025-12-09)
 - **STEAM-10**: Database Schema Migration Updates (Status: 2025-12-08)

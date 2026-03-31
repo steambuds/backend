@@ -11,6 +11,36 @@ Rails 8.0 API-only application for Steam Buds backend with JWT-based authenticat
 2.  **Update this file** with any new, relevant information or changes discovered during development. Do not rely on external context or previous conversations.
 3.  Treat the information herein as the ground truth for all operations.
 4.  **Follow the task-based approach** documented below for all development work.
+5.  **Follow the test-driven development (TDD) workflow** documented below for all code changes.
+
+## Test-Driven Development (TDD) Workflow
+**CRITICAL:** All development work must follow a strict test-first approach:
+
+### Workflow Steps
+1. **Write Tests First**
+   - Create comprehensive RSpec tests that define the expected behavior
+   - Tests should cover all requirements and edge cases
+   - Follow project conventions for test file naming and structure (see Project Conventions section)
+   - Include both positive and negative test cases
+
+2. **Wait for User Review**
+   - After writing tests, STOP and present them to the user
+   - Do NOT proceed to implementation without user approval
+   - User will review tests for completeness and correctness
+
+3. **Implement Code**
+   - Only after user approves tests, write the implementation
+   - Write minimal code to make tests pass
+   - Follow project conventions and coding standards
+   - Run tests to verify implementation
+
+### TDD Benefits
+- Ensures clear specification before coding
+- Catches design issues early
+- Provides regression protection
+- Documents expected behavior
+
+**Note:** This TDD workflow applies to all feature development, bug fixes, and refactoring work. Tests are mandatory, not optional.
 
 ## Task Management Workflow
 This project follows a **task-based approach** for all development work:
